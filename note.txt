@@ -1,0 +1,27 @@
+Autres projets que l'on peut ajouter : 
+Premier projet automatisme entreprise : 
+Gestion d'économie d'énergie sur une installation (voir pdf"sur le retourneur de flan")
+La banderolle en haut où les différentes rubriques apparaissent, je ne la trouve pas très visible, c'est le cas également pour les rubriques, la taille de police est trop petite (quand je parle de rubrique je parle de "A propos", "Accueuil",etc.) 
+Ensuite dans les différentes compétences techniques et transversales, parfois la barre de progression ne s'affiche pas bien (voir screen shot). 
+J'aimerais dans la partie alternance, que les différentes installations (Presse emboutissages, découpes lasers, presse à injection plastiques) tu les fasses devenir cliquables, et que lorsque l'on clique dessus une image apparaît, image représentant l'installation (cela peut être un dessin réalisé par ta part, mais je verrai pour te fournir des plans plus intéressants ultèrieurement).
+-> 
+Modif réalisée le 19/05 à 23h 
+
+Problème avec l'onglet mail, cela ne semble pas bien fonctionner avec mon navigateur, rien ne se passe a part une nouvelle fenêtre qui s'ouvre, peut être une application de mail est nécessaire ? 
+Le projet paletiseur est un projet de 3ème année 
+Nouveau projet à ajouter : Projet de 2 ème année 
+Dimensionnement de l'installation électrique d'une maison, l'éclairage et le chauffage. 
+
+-> 
+Modif réalisée le 19/05 à 23h 
+J'aimerais parler du fait que ce qui m'a poussé à aller dans cette voie était la robotique, mais qu'après avoir découvert l'automatisme, ce fut une découverte inattendue mais qui m'a révélé ma vocation.
+Ensuite on a déjà modifié les liens linkedin et github il me semble. 
+Je vais prendre une photo de moi ultèrieurement. 
+Résous le problème pour la consultation téléphone. 
+Résous la section à propos par la méthode que tu penses être judicieuse. 
+Pour les barres de compétences tu as raison, faisons ça. 
+Ensuite regardons pour faire fonctionner cela sur vercel
+
+Modif le 20/05 à 14h
+
+Revoir les niveaux de maitrise des différentes compétences en diminuant gloablement le niveau de tout. 
