@@ -18,12 +18,12 @@ const globalStyles = `
     --bg2:       #13171a;
     --bg3:       #1a1f24;
     --border:    rgba(255,255,255,0.07);
-    --blue:      #3d8ef0;
-    --blue-dim:  rgba(61,142,240,0.15);
-    --blue-glow: rgba(61,142,240,0.06);
+    --blue:      #2d7dd2;
+    --blue-dim:  rgba(45,125,210,0.12);
+    --blue-glow: rgba(45,125,210,0.05);
     --text:      #f0f2f5;
     --muted:     #8a94a6;
-    --accent:    #c8d8f0;
+    --accent:    #b8cce8;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -277,8 +277,29 @@ function scrollTo(id: string) {
   window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
 }
 
+function useActiveSection() {
+  const [active, setActive] = useState("accueil");
+  useEffect(() => {
+    const ids = navLinks.map((l) => l.id);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(e.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+  return active;
+}
+
 /* ═══════════════════════════════════════════════════════════
-   NAVBAR  — with mobile hamburger
+   NAVBAR  — with mobile hamburger + active section highlight
 ═══════════════════════════════════════════════════════════ */
 const navLinks = [
   { label: "Accueil",     id: "accueil"    },
@@ -294,13 +315,13 @@ const navLinks = [
 function Navbar() {
   const scrolled = useNavScroll();
   const [menuOpen, setMenuOpen] = useState(false);
+  const active = useActiveSection();
 
   function handleNav(id: string) {
     setMenuOpen(false);
     setTimeout(() => scrollTo(id), 10);
   }
 
-  // lock body scroll when mobile menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -315,12 +336,32 @@ function Navbar() {
         <ul className="nav-links">
           {navLinks.map((l) => (
             <li key={l.id}>
-              <button className="nav-btn" onClick={() => handleNav(l.id)}>{l.label}</button>
+              <button
+                className="nav-btn"
+                onClick={() => handleNav(l.id)}
+                style={{
+                  color: active === l.id ? "#ffffff" : undefined,
+                }}
+              >
+                {l.label}
+                {/* Active underline dot */}
+                {active === l.id && (
+                  <span style={{
+                    position: "absolute",
+                    bottom: -6, left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 4, height: 4,
+                    borderRadius: "50%",
+                    background: "var(--blue)",
+                    display: "block",
+                  }} />
+                )}
+              </button>
             </li>
           ))}
         </ul>
 
-        {/* Hamburger button — mobile only */}
+        {/* Hamburger */}
         <button
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Menu"
@@ -340,17 +381,14 @@ function Navbar() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div
-          style={{
-            position: "fixed", inset: 0, zIndex: 999,
-            background: "rgba(10,12,14,0.97)",
-            backdropFilter: "blur(20px)",
-            display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            gap: 8,
-            animation: "mdFadeIn 0.2s ease",
-          }}
-        >
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 999,
+          background: "rgba(10,12,14,0.97)",
+          backdropFilter: "blur(20px)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          gap: 8, animation: "mdFadeIn 0.2s ease",
+        }}>
           {navLinks.map((l, i) => (
             <button
               key={l.id}
@@ -360,13 +398,11 @@ function Navbar() {
                 fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: "clamp(36px, 8vw, 52px)",
                 letterSpacing: "0.06em",
-                color: "rgba(240,242,245,0.85)",
+                color: active === l.id ? "var(--blue)" : "rgba(240,242,245,0.85)",
                 padding: "8px 24px",
                 transition: "color 0.2s",
                 animation: `fadeUp 0.4s ${i * 0.05 + 0.05}s both`,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--blue)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(240,242,245,0.85)")}
             >
               {l.label}
             </button>
@@ -446,7 +482,7 @@ function About() {
       <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 60, alignItems: "start", marginBottom: 64 }}>
 
         {/* Photo placeholder */}
-        <div className="reveal" style={{ position: "sticky", top: 90 }}>
+        <div className="reveal about-photo-col">
           <div style={{
             width: "100%", aspectRatio: "3/4",
             background: "var(--bg2)",
@@ -562,6 +598,10 @@ function About() {
           #apropos > div:nth-child(2) { grid-template-columns: 1fr !important; }
           #apropos > div:nth-child(2) > div:first-child { position: static !important; }
           #apropos > div:nth-child(3) { grid-template-columns: 1fr !important; }
+        }
+        .about-photo-col { position: sticky; top: 90px; }
+        @media (max-width: 860px) {
+          .about-photo-col { position: static !important; top: auto !important; }
         }
       `}</style>
     </section>
