@@ -358,21 +358,12 @@ function Navbar() {
                 onClick={() => handleNav(l.id)}
                 style={{
                   color: active === l.id ? "#ffffff" : undefined,
+                  borderBottom: active === l.id ? "2px solid var(--blue)" : "2px solid transparent",
+                  paddingBottom: 4,
+                  transition: "color 0.2s, border-color 0.2s",
                 }}
               >
                 {l.label}
-                {/* Active underline dot */}
-                {active === l.id && (
-                  <span style={{
-                    position: "absolute",
-                    bottom: -6, left: "50%",
-                    transform: "translateX(-50%)",
-                    width: 4, height: 4,
-                    borderRadius: "50%",
-                    background: "var(--blue)",
-                    display: "block",
-                  }} />
-                )}
               </button>
             </li>
           ))}
