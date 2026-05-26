@@ -192,6 +192,23 @@ const globalStyles = `
   .hero-word { display: inline-block; animation: fadeUp 0.8s cubic-bezier(.22,1,.36,1) both; }
   @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
+  /* Hero mobile fix */
+  @media (max-width: 600px) {
+    #accueil {
+      min-height: 100svh !important;
+      padding-top: 90px !important;
+      padding-bottom: 80px !important;
+      justify-content: flex-start !important;
+    }
+    #accueil > div[style] { padding-top: 0; }
+  }
+
+  /* Email button mobile fix */
+  @media (max-width: 520px) {
+    .contact-link { flex-wrap: wrap !important; }
+    .contact-link .copy-btn { width: 100%; text-align: center; justify-content: center; display: flex; }
+  }
+
   footer { padding: 40px 8%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid var(--border); }
   .glow-circle { position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; }
 `;
@@ -428,7 +445,7 @@ function Navbar() {
 ═══════════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <section id="accueil" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 8%", position: "relative", overflow: "hidden" }}>
+    <section id="accueil" style={{ minHeight: "100vh", minHeight: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 8% 60px", position: "relative", overflow: "hidden" }}>
       <div className="hero-grid" />
       <div className="scan-line" />
       <div className="glow-circle" style={{ width: 700, height: 700, background: "rgba(61,142,240,0.07)", top: -200, left: "40%" }} />
@@ -1442,20 +1459,20 @@ function Contact() {
           <button
             onClick={copyEmail}
             className="contact-link"
-            style={{ background: copied ? "rgba(61,142,240,0.08)" : undefined, borderColor: copied ? "rgba(61,142,240,0.4)" : undefined, width: "100%", textAlign: "left" }}
+            style={{ background: copied ? "rgba(45,125,210,0.08)" : undefined, borderColor: copied ? "rgba(45,125,210,0.4)" : undefined, width: "100%", textAlign: "left", flexWrap: "wrap", gap: 16 }}
           >
             <div className="contact-icon" style={{ background: copied ? "var(--blue)" : undefined, color: copied ? "#fff" : undefined }}>
               <Mail size={22} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 180 }}>
               <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>Email professionnel</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{EMAIL}</div>
             </div>
             <span style={{
-              fontSize: 12, fontWeight: 600, padding: "5px 14px", borderRadius: 20,
-              background: copied ? "rgba(64,192,112,0.15)" : "rgba(61,142,240,0.12)",
+              fontSize: 12, fontWeight: 600, padding: "7px 16px", borderRadius: 20,
+              background: copied ? "rgba(64,192,112,0.15)" : "rgba(45,125,210,0.12)",
               color: copied ? "#40c070" : "var(--blue)",
-              border: `1px solid ${copied ? "rgba(64,192,112,0.3)" : "rgba(61,142,240,0.25)"}`,
+              border: `1px solid ${copied ? "rgba(64,192,112,0.3)" : "rgba(45,125,210,0.25)"}`,
               transition: "all 0.3s", whiteSpace: "nowrap", flexShrink: 0,
             }}>
               {copied ? "✓ Copié !" : "Copier l'adresse"}
