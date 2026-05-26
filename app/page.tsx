@@ -436,7 +436,7 @@ function Navbar() {
 ═══════════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <section id="accueil" style={{ minHeight: "100vh", minHeight: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 8% 60px", position: "relative", overflow: "hidden" }}>
+    <section id="accueil" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px 8% 60px", position: "relative", overflow: "hidden" }}>
       <div className="hero-grid" />
       <div className="scan-line" />
       <div className="glow-circle" style={{ width: 700, height: 700, background: "rgba(61,142,240,0.07)", top: -200, left: "40%" }} />
