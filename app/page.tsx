@@ -22,7 +22,7 @@ const globalStyles = `
     --blue-dim:  rgba(45,125,210,0.12);
     --blue-glow: rgba(45,125,210,0.05);
     --text:      #f0f2f5;
-    --muted:     #8a94a6;
+    --muted:     #9aa4b4;
     --accent:    #b8cce8;
   }
 
@@ -298,19 +298,18 @@ function useActiveSection() {
   const [active, setActive] = useState("accueil");
   useEffect(() => {
     const ids = navLinks.map((l) => l.id);
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id);
-        });
-      },
-      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) io.observe(el);
-    });
-    return () => io.disconnect();
+    function onScroll() {
+      const scrollY = window.scrollY + 120; // offset navbar
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollY) current = id;
+      }
+      setActive(current);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return active;
 }
@@ -443,7 +442,7 @@ function Hero() {
       <div className="glow-circle" style={{ width: 400, height: 400, background: "rgba(100,160,240,0.05)", bottom: 0, right: "10%" }} />
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1100 }}>
         <div className="label" style={{ animation: "fadeUp 0.6s both" }}>BUT GEII — Automatisme &amp; Informatique Industrielle</div>
-        <h1 className="display" style={{ fontSize: "clamp(72px, 12vw, 160px)", color: "#fff", marginBottom: 24 }}>
+        <h1 className="display" style={{ fontSize: "clamp(56px, 10vw, 160px)", color: "#fff", marginBottom: 24 }}>
           {"Charly".split("").map((c, i) => <span key={i} className="hero-word" style={{ animationDelay: `${0.05 * i + 0.2}s` }}>{c}</span>)}
           <br />
           <span style={{ color: "var(--blue)", opacity: 0.9 }}>
@@ -454,8 +453,8 @@ function Hero() {
           </span>
         </h1>
         <p style={{ fontSize: "clamp(16px, 1.4vw, 20px)", color: "var(--muted)", maxWidth: 600, lineHeight: 1.7, marginBottom: 48, animation: "fadeUp 0.8s 1.3s both" }}>
-          Étudiant passionné par l'automatisme industriel, les systèmes embarqués et les technologies de demain.
-          Futur ingénieur — Alternant chez <span style={{ color: "var(--accent)" }}>Renault Douai</span>.
+          Étudiant en BUT GEII, spécialisé en automatisme et informatique industrielle.
+          En alternance chez <span style={{ color: "var(--accent)" }}>Ampère Electricity (Renault) — Douai</span>.
         </p>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap", animation: "fadeUp 0.8s 1.5s both" }}>
           <button className="btn-primary" onClick={() => scrollTo("projets")}>Voir mes projets <ArrowRight size={16} /></button>
@@ -482,7 +481,7 @@ function About() {
       <div style={{ marginBottom: 64 }}>
         <div className="label reveal">À propos</div>
         <h2 className="display reveal reveal-delay-1" style={{ fontSize: "clamp(48px, 6vw, 80px)", color: "#fff" }}>
-          De la robotique<br /><span style={{ color: "var(--blue)" }}>à ma vocation</span>
+          Parcours &amp; <span style={{ color: "var(--blue)" }}>Motivations</span>
         </h2>
       </div>
 
@@ -531,33 +530,30 @@ function About() {
 
         {/* Story narrative */}
         <div>
-          {/* Étape 1 — La graine */}
-          <div className="reveal reveal-delay-1" style={{ marginBottom: 36, paddingLeft: 24, borderLeft: "2px solid rgba(61,142,240,0.3)" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>Le déclic</div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>Un frère, un robot, une passion</h3>
+          {/* Étape 1 */}
+          <div className="reveal reveal-delay-1" style={{ marginBottom: 36, paddingLeft: 24, borderLeft: "2px solid rgba(45,125,210,0.3)" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>Origine</div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>Un intérêt pour la technique dès le départ</h3>
             <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.85 }}>
-              Tout a commencé grâce à mon frère, véritable source d'inspiration. Voir un robot qu'il avait entièrement conçu et programmé résoudre un Rubik's Cube sous mes yeux a été un choc. C'est à ce moment que j'ai compris que je voulais moi aussi <strong style={{ color: "var(--accent)" }}>créer des machines qui pensent et agissent</strong>. La robotique est devenue mon objectif.
+              Mon attrait pour les systèmes techniques s'est développé tôt, notamment à travers mon frère dont les projets d'électronique et de programmation m'ont initié à ces domaines. L'un d'eux — un robot capable de résoudre un Rubik's Cube — m'a donné envie de comprendre comment concevoir et programmer des systèmes automatisés.
             </p>
           </div>
 
-          {/* Étape 2 — La découverte inattendue */}
-          <div className="reveal reveal-delay-2" style={{ marginBottom: 36, paddingLeft: 24, borderLeft: "2px solid rgba(61,142,240,0.6)" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>La révélation</div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>L'automatisme : une découverte inattendue</h3>
-            <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.85, marginBottom: 12 }}>
-              En entrant en BUT GEII avec la robotique en tête, je n'imaginais pas que l'automatisme industriel allait me révéler ma vocation. Ce premier contact avec les GRAFCET, les automates, les systèmes de production réels… c'était une évidence.
-            </p>
+          {/* Étape 2 */}
+          <div className="reveal reveal-delay-2" style={{ marginBottom: 36, paddingLeft: 24, borderLeft: "2px solid rgba(45,125,210,0.6)" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>Formation</div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>De la robotique à l'automatisme industriel</h3>
             <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.85 }}>
-              L'automatisme n'est pas juste de la robotique appliquée à l'industrie — c'est une discipline à part entière, avec sa rigueur, sa logique, ses enjeux concrets. <strong style={{ color: "var(--accent)" }}>J'avais trouvé ma voie.</strong>
+              En intégrant le BUT GEII, j'avais initialement un intérêt marqué pour la robotique. Les enseignements en automatisme — GRAFCET, langages automates, systèmes de production — m'ont orienté vers l'automatisme industriel, domaine dans lequel j'ai progressivement concentré mes efforts et mes projets.
             </p>
           </div>
 
-          {/* Étape 3 — Aujourd'hui */}
+          {/* Étape 3 */}
           <div className="reveal reveal-delay-3" style={{ marginBottom: 36, paddingLeft: 24, borderLeft: "2px solid var(--blue)" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>Aujourd'hui</div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>Du terrain, de l'autonomie, de la passion</h3>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 10 }}>Alternance</div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>Mise en pratique en environnement industriel</h3>
             <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.85 }}>
-              Mon alternance chez Renault à Douai a transformé la théorie en pratique réelle : presses d'emboutissage, découpes laser, automates Siemens, modifications d'IHM en conditions de production. Chaque intervention renforce ma conviction : <strong style={{ color: "var(--accent)" }}>l'industrie est mon environnement naturel.</strong>
+              Mon alternance chez Ampère Electricity (Renault) à Douai m'a permis d'intervenir sur des équipements en production réelle : presses d'emboutissage, découpes laser, automates Siemens et Schneider, modification d'IHM. Ces missions ont renforcé ma rigueur technique et mon autonomie dans la résolution de problèmes industriels.
             </p>
           </div>
 
@@ -568,12 +564,12 @@ function About() {
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--blue)" }}>Projet professionnel</span>
             </div>
             <p style={{ fontSize: 15, color: "var(--text)", lineHeight: 1.8, marginBottom: 10 }}>
-              Poursuivre en <strong style={{ color: "var(--accent)" }}>école d'ingénieur</strong> spécialisée en Génie Électrique et Informatique Industrielle, avec une spécialisation en automatisme.
+              Poursuivre en <strong style={{ color: "var(--accent)" }}>école d'ingénieur</strong> dans le domaine du Génie Électrique et de l'Informatique Industrielle, avec une spécialisation en automatisme.
             </p>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap", marginTop: 16 }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 4 }}>Court terme</div>
-                <div style={{ fontSize: 13, color: "var(--accent)" }}>BUT GEII + École d'ingénieur</div>
+                <div style={{ fontSize: 13, color: "var(--accent)" }}>Obtenir le BUT GEII · Intégrer une école d'ingénieur</div>
               </div>
               <div style={{ width: 1, background: "var(--border)" }} />
               <div>
@@ -915,7 +911,11 @@ function Projects() {
                 <span className="project-tag">{p.tag}</span>
                 <h3 style={{ fontSize: 21, fontWeight: 700, marginBottom: 10, color: "var(--text)" }}>{p.title}</h3>
                 <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.7 }}>{p.desc}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 14 }}>
+                {/* Badge compétence visible directement */}
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, padding: "4px 10px", borderRadius: 6, background: `${p.color}12`, border: `1px solid ${p.color}35` }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: p.color }}>{p.competence}</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 10 }}>
                   {p.highlights.map((h) => (
                     <span key={h} style={{ padding: "3px 9px", borderRadius: 6, border: "1px solid var(--border)", fontSize: 11, color: "var(--muted)", background: "var(--bg3)" }}>{h}</span>
                   ))}
@@ -1225,7 +1225,7 @@ function Alternance() {
               Renault <span style={{ color: "var(--blue)" }}>Douai</span>
             </h2>
             <p className="reveal reveal-delay-2" style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.8, marginBottom: 16 }}>
-              Technicien de maintenance au sein de l'usine <strong style={{ color: "var(--accent)" }}>George Besse</strong> de Renault à Douai. Intervention sur des équipements industriels critiques au cœur d'une chaîne de production automobile.
+              Technicien de maintenance au sein de l'usine <strong style={{ color: "var(--accent)" }}>Ampère Electricity (Renault)</strong> à Douai. Intervention sur des équipements industriels critiques au cœur d'une chaîne de production automobile.
             </p>
             <p className="reveal reveal-delay-3" style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.8, marginBottom: 28 }}>
               Cette expérience m'a permis de développer une véritable méthodologie de dépannage et une autonomie progressive dans des environnements de production exigeants.
@@ -1312,7 +1312,7 @@ const loisirs = [
   { icon: "🏎️", title: "Formule 1", desc: "Passionné par la F1 depuis plusieurs années, je suis de près les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030" },
   { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en engineering, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#3d8ef0" },
   { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0" },
-  { icon: "📚", title: "Mangas & culture japonaise", desc: "Fan de mangas et de la culture japonaise en général, j'apprécie l'univers créatif et la philosophie du travail bien fait — une vision proche de l'exigence industrielle japonaise mondialement reconnue.", tags: ["Culture", "Créativité", "Ouverture d'esprit"], color: "#e06020" },
+  { icon: "📚", title: "Lecture & Mangas", desc: "Passionné de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020" },
 ];
 
 function Loisirs() {
@@ -1361,37 +1361,103 @@ function Loisirs() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   CV
+   CV  — real content from uploaded PDF
 ═══════════════════════════════════════════════════════════ */
 function CV() {
   return (
     <section id="cv" className="section">
-      <div style={{ textAlign: "center", marginBottom: 64 }}>
-        <div className="label reveal" style={{ justifyContent: "center" }}>CV</div>
+      <div style={{ marginBottom: 64 }}>
+        <div className="label reveal">CV</div>
         <h2 className="display reveal reveal-delay-1" style={{ fontSize: "clamp(42px, 5.5vw, 72px)", color: "#fff" }}>
           Curriculum <span style={{ color: "var(--blue)" }}>Vitae</span>
         </h2>
       </div>
-      <div className="reveal reveal-delay-2" style={{ maxWidth: 800, margin: "0 auto", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 28, padding: "56px 64px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(61,142,240,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(61,142,240,0.03) 1px, transparent 1px)", backgroundSize: "40px 40px", pointerEvents: "none" }} />
-        <div style={{ position: "relative" }}>
-          <div style={{ width: 180, height: 240, background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 10, margin: "0 auto 40px", display: "flex", flexDirection: "column", padding: 16, gap: 8, boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(61,142,240,0.1)" }}>
-            <div style={{ height: 4, background: "var(--blue)", borderRadius: 2, width: "60%" }} />
-            <div style={{ height: 3, background: "var(--border)", borderRadius: 2, width: "80%" }} />
-            <div style={{ height: 3, background: "var(--border)", borderRadius: 2, width: "70%" }} />
-            <div style={{ marginTop: 8, height: 2, background: "rgba(61,142,240,0.3)", borderRadius: 2, width: "100%" }} />
-            {[80, 65, 90, 55, 75].map((w, i) => <div key={i} style={{ height: 2, background: "var(--border)", borderRadius: 2, width: `${w}%` }} />)}
-            <div style={{ marginTop: 6, height: 2, background: "rgba(61,142,240,0.3)", borderRadius: 2, width: "100%" }} />
-            {[70, 85, 60].map((w, i) => <div key={i} style={{ height: 2, background: "var(--border)", borderRadius: 2, width: `${w}%` }} />)}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+
+        {/* Left — aperçu du contenu */}
+        <div className="reveal">
+          {/* Formation */}
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 16 }}>— Formation</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ padding: "16px 20px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 12 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>BUT GEII — 3ème année</div>
+                <div style={{ fontSize: 12, color: "var(--blue)", margin: "3px 0" }}>Université Polytechnique Hauts-de-France · Valenciennes</div>
+                <div style={{ fontSize: 12, color: "var(--muted)" }}>Depuis septembre 2023</div>
+              </div>
+              <div style={{ padding: "16px 20px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 12 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>Baccalauréat Général — Mention Très Bien</div>
+                <div style={{ fontSize: 12, color: "var(--blue)", margin: "3px 0" }}>Lycée Ernest Couteaux · Saint-Amand-les-Eaux</div>
+                <div style={{ fontSize: 12, color: "var(--muted)" }}>2020 – 2023 · Maths, Sciences de l'ingénieur, Maths Expertes</div>
+              </div>
+            </div>
           </div>
-          <h3 style={{ fontSize: 20, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Charly VERDIERE-PARENT</h3>
-          <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 36, lineHeight: 1.6 }}>Étudiant BUT GEII — Alternant technicien de maintenance<br />Renault George Besse, Douai</p>
-          <a href="/cv.pdf" download className="btn-primary" style={{ margin: "0 auto" }}>
-            <Download size={16} /> Télécharger le CV (PDF)
-          </a>
-          <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16 }}>Placez votre CV dans <code style={{ color: "var(--blue)" }}>/public/cv.pdf</code></p>
+
+          {/* Expérience */}
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 16 }}>— Expérience</p>
+            <div style={{ padding: "16px 20px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 12 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>Apprenti Technicien de maintenance</div>
+              <div style={{ fontSize: 12, color: "var(--blue)", margin: "3px 0" }}>Ampère Electricity (Renault) · Douai</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Depuis septembre 2023</div>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 4 }}>
+                {["Maintenance préventive et curative des équipements industriels", "Réalisation d'un projet d'amélioration des processus", "Mise en place de nouveaux équipements et machines"].map((item) => (
+                  <li key={item} style={{ fontSize: 12, color: "var(--muted)", display: "flex", gap: 8 }}>
+                    <span style={{ color: "var(--blue)", flexShrink: 0 }}>→</span>{item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Compétences clés */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 14 }}>— Outils & logiciels</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {["Control Expert", "PL7 Pro", "TIA Portal", "Step 7", "Step 5", "WIN CC", "Unity Pro"].map((tool) => (
+                <span key={tool} style={{ padding: "5px 12px", borderRadius: 6, border: "1px solid var(--border)", fontSize: 12, color: "var(--accent)", background: "var(--bg2)" }}>{tool}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right — téléchargement */}
+        <div className="reveal reveal-delay-2">
+          <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 24, padding: "48px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(45,125,210,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(45,125,210,0.03) 1px, transparent 1px)", backgroundSize: "40px 40px", pointerEvents: "none" }} />
+            <div style={{ position: "relative" }}>
+              {/* CV preview mockup */}
+              <div style={{ width: 150, height: 200, background: "var(--bg3)", border: "1px solid rgba(45,125,210,0.2)", borderRadius: 8, margin: "0 auto 32px", display: "flex", flexDirection: "column", padding: 14, gap: 6, boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(45,125,210,0.1)" }}>
+                <div style={{ height: 4, background: "var(--blue)", borderRadius: 2, width: "55%" }} />
+                <div style={{ height: 2, background: "rgba(45,125,210,0.3)", borderRadius: 2, width: "85%", marginTop: 2 }} />
+                <div style={{ height: 2, background: "var(--border)", borderRadius: 2, width: "70%" }} />
+                <div style={{ marginTop: 6, height: 1.5, background: "rgba(45,125,210,0.25)", borderRadius: 2, width: "100%" }} />
+                {[75, 60, 85, 50, 70, 65].map((w, i) => <div key={i} style={{ height: 1.5, background: "var(--border)", borderRadius: 2, width: `${w}%` }} />)}
+                <div style={{ marginTop: 4, height: 1.5, background: "rgba(45,125,210,0.25)", borderRadius: 2, width: "100%" }} />
+                {[65, 80, 55, 70].map((w, i) => <div key={i} style={{ height: 1.5, background: "var(--border)", borderRadius: 2, width: `${w}%` }} />)}
+              </div>
+
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>Charly VERDIERE-PARENT</div>
+              <div style={{ fontSize: 12, color: "var(--blue)", marginBottom: 6 }}>Alternance — Ingénieur GEII</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 32, lineHeight: 1.6 }}>
+                Valenciennes · 21 ans · Permis B<br />
+                TOEIC 840 · Véhicule personnel
+              </div>
+
+              <a href="/cv.pdf" download="CV_Charly_VERDIERE-PARENT.pdf" className="btn-primary" style={{ margin: "0 auto", display: "inline-flex" }}>
+                <Download size={16} /> Télécharger le CV (PDF)
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 860px) {
+          #cv > div:last-child { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -1437,7 +1503,7 @@ function Contact() {
           </a>
 
           {/* GitHub */}
-          <a href="https://github.com" className="contact-link" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/charlyverdiere-star" className="contact-link" target="_blank" rel="noopener noreferrer">
             <div className="contact-icon"><Github size={22} /></div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>Projets &amp; code</div>
