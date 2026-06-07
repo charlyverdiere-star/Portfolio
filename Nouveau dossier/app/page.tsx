@@ -1,1 +1,0 @@
-export default function Home(){return <div style={{padding:'40px',background:'#111315',color:'white'}}>Portfolio V2 prêt. Remplace ce fichier par le code complet fourni dans le chat.</div>}
