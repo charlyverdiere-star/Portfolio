@@ -624,23 +624,23 @@ const LEVEL_MAP: Record<SkillLevel, { pct: number; color: string }> = {
 };
 
 const technicalSkills: { icon: React.ReactNode; name: string; desc: string; level: SkillLevel }[] = [
-  { icon: <Zap size={22} />,      name: "Automatisme",              desc: "GRAFCET, Ladder, API Siemens & TSX Premium, PL7 Pro",     level: "Maîtrise" },
-  { icon: <Network size={22} />,  name: "Réseaux industriels",      desc: "Communication automate/IHM, diagnostic réseau industriel", level: "Pratique" },
-  { icon: <Code2 size={22} />,    name: "Programmation",            desc: "Python, C, Arduino, Unity Pro, PL7 Pro",                   level: "Pratique" },
-  { icon: <Activity size={22} />, name: "Électronique",             desc: "Montages analogiques, numériques, capteurs industriels",   level: "Pratique" },
-  { icon: <Settings size={22} />, name: "Supervision / IHM",       desc: "WIN CC, création et modification d'interfaces opérateur",  level: "Maîtrise" },
-  { icon: <Wrench size={22} />,   name: "Maintenance industrielle", desc: "Dépannage méthodique, presses, découpes laser, relais",    level: "Maîtrise" },
+  { icon: <Zap size={22} />,      name: "Automatisme",              desc: "GRAFCET, Ladder, API Siemens & TSX Premium, PL7 Pro",     level: "Pratique" },
+  { icon: <Network size={22} />,  name: "Réseaux industriels",      desc: "Communication automate/IHM, diagnostic réseau industriel", level: "Notions" },
+  { icon: <Code2 size={22} />,    name: "Programmation",            desc: "Python, C, Arduino, Unity Pro, PL7 Pro",                   level: "Notions" },
+  { icon: <Activity size={22} />, name: "Électronique",             desc: "Montages analogiques, numériques, capteurs industriels",   level: "Notions" },
+  { icon: <Settings size={22} />, name: "Supervision / IHM",       desc: "WIN CC, création et modification d'interfaces opérateur",  level: "Pratique" },
+  { icon: <Wrench size={22} />,   name: "Maintenance industrielle", desc: "Dépannage méthodique, presses, découpes laser, relais",    level: "Pratique" },
   { icon: <Cpu size={22} />,      name: "Électricité industrielle", desc: "Câblage, cartes analogiques, relais, plans électriques",   level: "Pratique" },
   { icon: <BookOpen size={22} />, name: "Anglais — TOEIC 840",     desc: "Lecture de documentation technique, communication pro",     level: "Maîtrise" },
 ];
 
 const softSkills: { name: string; level: SkillLevel; desc: string }[] = [
-  { name: "Travail en équipe",        level: "Maîtrise", desc: "Projets académiques et missions entreprise" },
-  { name: "Résolution de problèmes",  level: "Maîtrise", desc: "Diagnostics terrain, approche méthodique" },
-  { name: "Rigueur & méthode",        level: "Maîtrise", desc: "Exigence industrielle au quotidien" },
-  { name: "Autonomie",                level: "Maîtrise", desc: "Missions en production sans encadrement" },
-  { name: "Communication technique",  level: "Pratique", desc: "Rédaction de rapports, échanges fabricants" },
-  { name: "Capacité d'adaptation",    level: "Maîtrise", desc: "Environnements variés, nouveaux outils" },
+  { name: "Travail en équipe",        level: "Pratique", desc: "Projets académiques et missions entreprise" },
+  { name: "Résolution de problèmes",  level: "Pratique", desc: "Diagnostics terrain, approche méthodique" },
+  { name: "Rigueur & méthode",        level: "Pratique", desc: "Exigence industrielle au quotidien" },
+  { name: "Autonomie",                level: "Pratique", desc: "Missions en production sans encadrement" },
+  { name: "Communication technique",  level: "Notions", desc: "Rédaction de rapports, échanges fabricants" },
+  { name: "Capacité d'adaptation",    level: "Pratique", desc: "Environnements variés, nouveaux outils" },
 ];
 
 function LevelBadge({ level }: { level: SkillLevel }) {
@@ -729,7 +729,7 @@ type Project = {
   tag: string; title: string; desc: string; icon: string;
   bg: string; highlights: string[]; color: string;
   context: string; objectifs: string[]; technologies: string[];
-  resultats: string; competence: string;
+  resultats: string; competence: string; competenceDetail?: string;
   lecons?: string;
   screenshots?: string[];
   ressources?: { label: string; href: string }[];
@@ -748,7 +748,8 @@ const projects: Project[] = [
     objectifs: ["Maîtriser la logique câblée et les logigrammes", "Concevoir des GRAFCET séquentiels", "Programmer en Ladder sur automate d'initiation", "Valider les programmes sur maquettes industrielles"],
     technologies: ["GRAFCET", "Ladder", "Logigrammes", "Portes logiques", "Automate didactique", "Maquettes"],
     resultats: "Socle de toutes mes compétences en automatisme. Ce module a confirmé mon orientation et m'a fourni les bases pour les projets suivants.",
-    competence: "C1 — Analyser un système automatisé",
+    competence: "Concevoir — Niveau 1",
+    competenceDetail: "Mener une conception partielle intégrant une démarche projet",
   },
   {
     tag: "Projet académique — 2ème année",
@@ -768,7 +769,8 @@ const projects: Project[] = [
     ],
     technologies: ["NF C 15-100", "Schémas unifilaires", "Calcul de puissance", "Dimensionnement câbles", "Tableaux électriques", "Logiciel de schématique"],
     resultats: "Installation électrique complète dimensionnée et documentée. Acquisition d'une méthodologie rigoureuse pour l'analyse des besoins, le calcul des protections et la rédaction de schémas aux normes.",
-    competence: "C1 — Concevoir une installation électrique",
+    competence: "Concevoir — Niveau 2",
+    competenceDetail: "Concevoir un système en fiabilisant les solutions proposées",
   },
   {
     tag: "Projet académique — 3ème année",
@@ -782,7 +784,8 @@ const projects: Project[] = [
     objectifs: ["Programmer l'automate TSX Premium avec Unity Pro", "Créer une IHM logiciel intuitive", "Assurer la communication bidirectionnelle automate ↔ IHM", "Respecter les normes européennes"],
     technologies: ["Automate TSX Premium", "Unity Pro", "Logiciel IHM", "GRAFCET", "Ladder", "Normes EN"],
     resultats: "Installation opérationnelle validée sur maquette. Renforcement des compétences en travail d'équipe et programmation automate.",
-    competence: "C2 — Concevoir et programmer un système automatisé",
+    competence: "Vérifier — Niveau 2",
+    competenceDetail: "Mettre en place un protocole de tests pour valider le fonctionnement d'un système",
   },
   {
     tag: "Projet entreprise · Renault — Alternance",
@@ -802,7 +805,8 @@ const projects: Project[] = [
     ],
     technologies: ["PL7 Pro (Schneider)", "Radar Sick", "Relais industriel", "Câblage armoire", "Plans électriques", "Borniers"],
     resultats: "Système opérationnel en production. Réduction effective de la consommation énergétique de l'éclairage du retourneur. Autonomie totale sur l'ensemble de la mission.",
-    competence: "C3 — Mettre en service et maintenir un système industriel",
+    competence: "Intégrer — Niveau 2",
+    competenceDetail: "Interagir avec les différents acteurs, lors de l'installation et de la mise en service d'un système, dans une démarche qualité",
     lecons: "Ne pas chercher trop compliqué : aller à l'essentiel, valider une chose simple, puis augmenter la complexité étape par étape.",
   },
   {
@@ -817,7 +821,28 @@ const projects: Project[] = [
     objectifs: ["Installer une sonde PT100 sur la poulie moteur", "Intégrer une carte analogique dans l'armoire", "Modifier le programme automate Siemens", "Mettre à jour l'IHM WIN CC (affichage + alarmes)"],
     technologies: ["Sonde PT100", "Carte analogique", "Automate Siemens", "WIN CC (IHM)", "Câblage industriel"],
     resultats: "Sonde opérationnelle en production. Surveillance en temps réel de la température, alertes automatiques avant surchauffe. Mission en totale autonomie.",
-    competence: "C4 — Améliorer et optimiser un système en production",
+    competence: "Maintenir — Niveau 2",
+    competenceDetail: "Mettre en place une stratégie de maintenance pour garantir un fonctionnement optimal",
+  },
+  {
+    tag: "Exemple de dépannage · Renault — Alternance",
+    title: "Dépannage : prise outil non bridée",
+    desc: "Première intervention menée en autonomie totale : une prise outil refuse de se brider et bloque le cycle. Diagnostic méthodique jusqu'à l'actionneur défaillant.",
+    icon: "🛠️",
+    bg: "linear-gradient(135deg, #1a1212 0%, #2a1a1a 100%)",
+    highlights: ["Diagnostic", "Vérin électrique", "Consignation", "Autonomie"],
+    color: "#e07050",
+    context: "Sur une installation d'emboutissage, une prise outil (qui raccorde l'air et l'alimentation aux outils) refuse de se brider, ce qui empêche la reprise du cycle de production. Il s'agissait de ma première intervention menée seul, en totale autonomie.",
+    objectifs: [
+      "Comprendre pourquoi le bridage de la prise n'est pas effectif",
+      "Localiser l'origine réelle du défaut",
+      "Remettre l'installation en condition de production en toute sécurité",
+    ],
+    technologies: ["Diagnostic électrique", "Programme automate", "Vérin électrique", "Consignation", "Multimètre"],
+    resultats: "Après avoir d'abord cherché à tort dans le programme automate, j'ai élargi l'analyse à l'actionneur : le moteur du vérin électrique de la prise était hors service. Remplacement après consignation, puis reprise de production validée.",
+    competence: "Maintenir — Niveau 1",
+    competenceDetail: "Intervenir sur un système pour effectuer une opération de maintenance",
+    lecons: "Ne jamais se focaliser sur une seule couche du système : quand le programme ne remonte rien d'anormal, le problème vient du réel (capteur, actionneur, câblage). Cette panne a structuré ma méthodologie de dépannage.",
   },
 ];
 
@@ -835,6 +860,11 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 8, background: `${project.color}15`, border: `1px solid ${project.color}35`, marginBottom: 20 }}>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: project.color }}>{project.competence}</span>
           </div>
+          {project.competenceDetail && (
+            <p style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.5, marginTop: -10, marginBottom: 20 }}>
+              <span style={{ color: project.color, fontWeight: 600 }}>Compétence visée : </span>{project.competenceDetail}
+            </p>
+          )}
           <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.8, marginBottom: 24 }}>{project.context}</p>
           <div className="modal-detail-grid">
             <div className="modal-detail-box">
