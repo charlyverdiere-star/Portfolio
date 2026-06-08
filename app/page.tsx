@@ -470,6 +470,77 @@ function Hero() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   TABLE DES MATIÈRES  — sommaire numéroté (attendu CDC)
+═══════════════════════════════════════════════════════════ */
+const tocItems = [
+  { num: "01", label: "À propos",    id: "apropos",     desc: "Parcours, motivations et projet professionnel" },
+  { num: "02", label: "Compétences", id: "competences", desc: "Compétences techniques et transversales" },
+  { num: "03", label: "Projets",     id: "projets",     desc: "Réalisations académiques et en entreprise" },
+  { num: "04", label: "Alternance",  id: "alternance",  desc: "Renault Douai — installations et missions" },
+  { num: "05", label: "Loisirs",     id: "loisirs",     desc: "Centres d'intérêt et valeurs" },
+  { num: "06", label: "CV",          id: "cv",          desc: "Formation, expérience et CV téléchargeable" },
+  { num: "07", label: "Contact",     id: "contact",     desc: "LinkedIn, GitHub et email" },
+];
+
+function TableOfContents() {
+  return (
+    <section id="sommaire" className="section">
+      <div style={{ marginBottom: 56 }}>
+        <div className="label reveal">Sommaire</div>
+        <h2 className="display reveal reveal-delay-1" style={{ fontSize: "clamp(42px, 5.5vw, 72px)", color: "#fff" }}>
+          Table des <span style={{ color: "var(--blue)" }}>matières</span>
+        </h2>
+        <p className="reveal reveal-delay-2" style={{ color: "var(--muted)", fontSize: 14, marginTop: 12 }}>
+          Cliquez sur une section pour y accéder directement.
+        </p>
+      </div>
+      <div className="toc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {tocItems.map((item, i) => (
+          <button
+            key={item.id}
+            className={`toc-row reveal reveal-delay-${(i % 4) + 1}`}
+            onClick={() => scrollTo(item.id)}
+          >
+            <span className="toc-num">{item.num}</span>
+            <span className="toc-text">
+              <span className="toc-label">{item.label}</span>
+              <span className="toc-desc">{item.desc}</span>
+            </span>
+            <ArrowRight size={18} className="toc-arrow" />
+          </button>
+        ))}
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .toc-row {
+          display: flex; align-items: center; gap: 20px;
+          width: 100%; text-align: left;
+          padding: 22px 26px;
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          transition: border-color 0.3s, background 0.3s, transform 0.3s;
+        }
+        .toc-row:hover { border-color: rgba(45,125,210,0.35); background: var(--bg3); transform: translateX(6px); }
+        .toc-num {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 34px; line-height: 1;
+          color: var(--blue); opacity: 0.85;
+          flex-shrink: 0; min-width: 44px;
+        }
+        .toc-text { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+        .toc-label { font-size: 16px; font-weight: 700; color: var(--text); }
+        .toc-desc { font-size: 13px; color: var(--muted); }
+        .toc-arrow { color: var(--muted); flex-shrink: 0; opacity: 0; transform: translateX(-4px); transition: opacity 0.25s, transform 0.25s, color 0.25s; }
+        .toc-row:hover .toc-arrow { opacity: 1; transform: translateX(0); color: var(--blue); }
+        @media (max-width: 720px) { .toc-grid { grid-template-columns: 1fr !important; } }
+      ` }} />
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    ABOUT  — narrative redesign, photo placeholder, story cards
 ═══════════════════════════════════════════════════════════ */
 function About() {
@@ -732,6 +803,7 @@ type Project = {
   resultats: string; competence: string; competenceDetail?: string;
   lecons?: string;
   screenshots?: string[];
+  videos?: { src: string; label?: string }[];
   ressources?: { label: string; href: string }[];
 };
 
@@ -786,6 +858,12 @@ const projects: Project[] = [
     resultats: "Installation opérationnelle validée sur maquette. Renforcement des compétences en travail d'équipe et programmation automate.",
     competence: "Vérifier — Niveau 2",
     competenceDetail: "Mettre en place un protocole de tests pour valider le fonctionnement d'un système",
+    screenshots: [
+      "/projets/palettiseur-ihm-1.png", "/projets/palettiseur-ihm-2.png", "/projets/palettiseur-ihm-3.png",
+      "/projets/palettiseur-ihm-4.png", "/projets/palettiseur-ihm-5.png", "/projets/palettiseur-ihm-6.png",
+      "/projets/palettiseur-ihm-7.png", "/projets/palettiseur-gemma.jpg", "/projets/palettiseur-synthese.png",
+    ],
+    ressources: [{ label: "Guide utilisateur du projet (PDF)", href: "/projets/palettiseur-guide.pdf" }],
   },
   {
     tag: "Projet entreprise · Renault — Alternance",
@@ -808,6 +886,8 @@ const projects: Project[] = [
     competence: "Intégrer — Niveau 2",
     competenceDetail: "Interagir avec les différents acteurs, lors de l'installation et de la mise en service d'un système, dans une démarche qualité",
     lecons: "Ne pas chercher trop compliqué : aller à l'essentiel, valider une chose simple, puis augmenter la complexité étape par étape.",
+    screenshots: ["/projets/retourneur-photo.jpg"],
+    videos: [{ src: "/projets/retourneur-demo.mp4", label: "Démonstration du système d'économie d'énergie sur le retourneur" }],
   },
   {
     tag: "Projet entreprise · Renault — Alternance",
@@ -823,6 +903,14 @@ const projects: Project[] = [
     resultats: "Sonde opérationnelle en production. Surveillance en temps réel de la température, alertes automatiques avant surchauffe. Mission en totale autonomie.",
     competence: "Maintenir — Niveau 2",
     competenceDetail: "Mettre en place une stratégie de maintenance pour garantir un fonctionnement optimal",
+    screenshots: [
+      "/projets/sonde-synoptique.jpg", "/projets/sonde-armoire.jpg", "/projets/sonde-carte-analogique.jpg",
+      "/projets/sonde-programme-1.jpg", "/projets/sonde-programme-2.jpg", "/projets/sonde-programme-3.jpg", "/projets/sonde-programme-4.jpg",
+    ],
+    videos: [
+      { src: "/projets/sonde-moteur-principal.mp4", label: "Moteur principal de la presse (ligne 21)" },
+      { src: "/projets/sonde-presse210.mp4", label: "Presse 210 (ligne 21)" },
+    ],
   },
   {
     tag: "Exemple de dépannage · Renault — Alternance",
@@ -898,6 +986,19 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                   <a key={i} href={src} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)" }}>
                     <img src={src} alt={`${project.title} — capture ${i + 1}`} style={{ width: "100%", display: "block" }} />
                   </a>
+                ))}
+              </div>
+            </div>
+          )}
+          {project.videos && project.videos.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 12 }}>Vidéos</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14 }}>
+                {project.videos.map((v, i) => (
+                  <div key={i}>
+                    <video src={v.src} controls preload="metadata" playsInline style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)", background: "#000", display: "block" }} />
+                    {v.label && <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{v.label}</p>}
+                  </div>
                 ))}
               </div>
             </div>
@@ -1211,7 +1312,7 @@ const timelineItems = [
   { period: "Aujourd'hui",         title: "Autonomie progressive",               desc: "Développement de méthodologies de dépannage propres. Intervention croissamment autonome sur des systèmes industriels complexes." },
 ];
 
-type InstallModal = { title: string; subtitle: string; desc: string; svg: React.ReactNode } | null;
+type InstallModal = { title: string; subtitle: string; desc: string; svg: React.ReactNode; photos?: string[]; video?: string } | null;
 
 const installations = [
   {
@@ -1220,6 +1321,8 @@ const installations = [
       title: "Presse d'emboutissage",
       subtitle: "Renault Georges Besse · Douai",
       desc: "Presses hydrauliques de grande capacité utilisées pour déformer des flans métalliques et leur donner la forme des pièces de carrosserie automobile. Interventions de maintenance sur les systèmes hydrauliques, électriques et sur les automates de commande (Siemens). Projet sonde de température PT100 réalisé sur ce type de machine.",
+      photos: ["/projets/presse-emboutissage.jpg", "/projets/emboutissage-flan.jpg", "/projets/emboutissage-piece-finie.jpg"],
+      video: "/projets/emboutissage-ligne522.mp4",
       svg: <PresseSVG />,
     },
   },
@@ -1229,6 +1332,7 @@ const installations = [
       title: "Découpe laser CNC",
       subtitle: "Renault Georges Besse · Douai",
       desc: "Centres de découpe laser pilotés par CNC permettant de découper avec précision des pièces métalliques selon des programmes numériques. Maintenance des têtes laser, des systèmes de guidage et des capteurs de positionnement. Interventions sur les programmes automates et les interfaces de supervision.",
+      photos: ["/projets/decoupe-laser.jpg"],
       svg: <LaserSVG />,
     },
   },
@@ -1238,6 +1342,7 @@ const installations = [
       title: "Presse à injection plastique",
       subtitle: "Renault Georges Besse · Douai",
       desc: "Machines d'injection plastique permettant de fabriquer des pièces de garniture intérieure automobile par injection de matière thermoplastique dans des moules. Maintenance des systèmes hydrauliques de fermeture, des unités d'injection, des systèmes de régulation thermique et des automates de commande.",
+      video: "/projets/injection-demo.mp4",
       svg: <InjectionSVG />,
     },
   },
@@ -1247,6 +1352,8 @@ const installations = [
       title: "Retourneur de flans",
       subtitle: "Projet éclairage · Radar Sick · PL7 Pro",
       desc: "Installation permettant de retourner des paquets de flans (état précédent d'une pièce de carrosserie) entre deux convoyeurs. Projet personnel : conception et réalisation d'un système de gestion d'économie d'énergie sur l'éclairage via un radar de présence Sick, modification du programme PL7 Pro et câblage d'un relais.",
+      photos: ["/projets/retourneur-photo.jpg"],
+      video: "/projets/retourneur-demo.mp4",
       svg: <RetourneurSVG />,
     },
   },
@@ -1345,13 +1452,28 @@ function Alternance() {
               <button className="modal-close" onClick={() => setInstallModal(null)}><X size={16} /></button>
             </div>
             <div className="modal-body">
-              {/* SVG illustration */}
-              <div style={{ width: "100%", borderRadius: 16, overflow: "hidden", marginBottom: 24, border: "1px solid var(--border)", aspectRatio: "16/9" }}>
+              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.8, marginBottom: 24 }}>{installModal.desc}</p>
+
+              {installModal.photos && installModal.photos.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
+                  {installModal.photos.map((src, i) => (
+                    <a key={i} href={src} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)" }}>
+                      <img src={src} alt={`${installModal.title} — photo ${i + 1}`} style={{ width: "100%", display: "block" }} />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {installModal.video && (
+                <video src={installModal.video} controls preload="metadata" playsInline style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)", background: "#000", marginBottom: 20, display: "block" }} />
+              )}
+
+              {/* Schéma de principe */}
+              <div style={{ width: "100%", borderRadius: 16, overflow: "hidden", border: "1px solid var(--border)", aspectRatio: "16/9" }}>
                 {installModal.svg}
               </div>
-              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.8 }}>{installModal.desc}</p>
-              <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, fontStyle: "italic", opacity: 0.7 }}>
-                🎨 Illustration schématique — des plans techniques plus détaillés seront ajoutés prochainement.
+              <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10, fontStyle: "italic", opacity: 0.7 }}>
+                Schéma de principe de l'installation.
               </p>
             </div>
           </div>
@@ -1624,6 +1746,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <TableOfContents />
         <About />
         <Skills />
         <Projects />
