@@ -192,10 +192,11 @@ const globalStyles = `
   @keyframes fxDash { from { transform: translateX(-140%); } to { transform: translateX(560%); } }
   .fx-f1-line { position: absolute; left: 0; height: 2px; width: 30%; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(232,48,48,0.9), transparent); animation: fxDash 0.45s linear infinite; }
 
-  /* Musculation — impact de la barre */
-  @keyframes fxShake { 0%, 100% { transform: none; } 15% { transform: translateY(8px) rotate(-0.7deg); } 30% { transform: translateY(-3px) rotate(0.4deg); } 45% { transform: translateY(5px); } 60% { transform: translateY(-2px); } 75% { transform: translateY(2px); } }
-  .loisir-card.fx-shake { animation: fxShake 0.6s cubic-bezier(.25,.85,.35,1); }
-  @keyframes fxDrop { 0% { transform: translateY(-90px) ; opacity: 0; } 40% { transform: translateY(10px); opacity: 1; } 58% { transform: translateY(-7px); } 74% { transform: translateY(3px); } 100% { transform: translateY(0); opacity: 0.9; } }
+  /* Musculation — pump : la carte gonfle/pulse + compteur de reps qui s'incrémente */
+  @keyframes fxPump { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 18% { transform: scale(1.03); box-shadow: 0 0 0 6px rgba(45,125,210,0.12), 0 14px 36px rgba(45,125,210,0.25); } 36% { transform: scale(0.985); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 54% { transform: scale(1.025); box-shadow: 0 0 0 4px rgba(45,125,210,0.1), 0 12px 30px rgba(45,125,210,0.22); } 72% { transform: scale(0.99); } 90% { transform: scale(1.012); } }
+  .loisir-card.fx-pump { animation: fxPump 1.45s cubic-bezier(.45,.05,.55,.95); }
+  @keyframes fxRep { 0% { transform: translateY(34px) scale(0.4); opacity: 0; } 30% { transform: translateY(0) scale(1.15); opacity: 1; } 75% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-22px) scale(1); opacity: 0; } }
+  @keyframes fxFlex { 0% { transform: translateY(20px) scale(0.6); opacity: 0; } 30% { transform: translateY(0) scale(1.1) rotate(-3deg); opacity: 1; } 60% { transform: scale(1) rotate(0); } 100% { transform: scale(1.05); opacity: 0; } }
 
   /* Zelda — triforce qui s'assemble */
   @keyframes fxTriIn1 { from { transform: translate(-80px, -70px) rotate(-160deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
@@ -204,9 +205,31 @@ const globalStyles = `
   @keyframes fxTriGlow { 0%, 55% { filter: drop-shadow(0 0 5px rgba(255,216,96,0.5)); } 78% { filter: drop-shadow(0 0 22px rgba(255,216,96,1)); } 100% { filter: drop-shadow(0 0 10px rgba(255,216,96,0.7)); } }
   .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; }
 
-  /* Rasengan — orbe de chakra */
-  @keyframes fxOrbPulse { 0% { transform: scale(0.1); opacity: 0; } 25% { opacity: 1; } 72% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-  @keyframes fxOrbSpin { from { transform: rotate(0deg); } to { transform: rotate(900deg); } }
+  /* Aura SSJ2 — flammes jaunes qui jaillissent autour de la carte + éclairs */
+  @keyframes fxAuraFlicker {
+    0%   { opacity: 0; transform: scale(0.7) translateY(20px); }
+    18%  { opacity: 0.85; transform: scale(1.02) translateY(0); }
+    35%  { opacity: 0.55; transform: scale(0.97); }
+    52%  { opacity: 0.95; transform: scale(1.04); }
+    70%  { opacity: 0.65; transform: scale(0.99); }
+    85%  { opacity: 0.8;  transform: scale(1.02); }
+    100% { opacity: 0;    transform: scale(1.1) translateY(-15px); }
+  }
+  @keyframes fxAuraTongue {
+    0%   { transform: translateY(0) scaleY(0.4) scaleX(1); opacity: 0; }
+    20%  { transform: translateY(-30px) scaleY(1.15) scaleX(0.92); opacity: 1; }
+    55%  { transform: translateY(-58px) scaleY(0.85) scaleX(1.1); opacity: 0.95; }
+    100% { transform: translateY(-110px) scaleY(0.2) scaleX(0.5); opacity: 0; }
+  }
+  @keyframes fxBoltFlash {
+    0%, 100% { opacity: 0; }
+    8%, 14%  { opacity: 0.95; }
+    22%      { opacity: 0; }
+    40%, 46% { opacity: 0.95; }
+    54%      { opacity: 0; }
+    70%, 76% { opacity: 0.95; }
+  }
+  .loisir-card.fx-ssj2 { box-shadow: 0 0 0 2px rgba(255,216,80,0.65), 0 0 60px rgba(255,200,40,0.55), 0 0 100px rgba(255,170,40,0.35); transition: box-shadow 0.2s; }
 
   /* CONTACT */
   .contact-link { display: flex; align-items: center; gap: 20px; padding: 24px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; color: var(--text); transition: border-color 0.3s, transform 0.3s, background 0.3s; }
@@ -845,8 +868,6 @@ type Project = {
   screenshots?: string[];
   videos?: { src: string; label?: string }[];
   ressources?: { label: string; href: string }[];
-  /* Galerie « générations de logiciels » : entrée sans src = tuile typographique */
-  generations?: { src?: string; label: string; year: string; desc: string }[];
 };
 
 const projects: Project[] = [
@@ -861,14 +882,10 @@ const projects: Project[] = [
     context: "Premier module d'automatisme du BUT GEII, et mon premier vrai contact avec les systèmes automatisés. Tout a commencé sur des maquettes à logigrammes : des platines sur lesquelles on câble physiquement des portes logiques (ET, OU, NON, mémoires) pour construire la logique d'un automatisme. C'est sur ces maquettes que j'ai appris à raisonner, d'abord en logique combinatoire puis en séquentiel, avant de passer au GRAFCET et au langage Ladder sur automate.",
     objectifs: ["Câbler des fonctions logiques sur maquettes à logigrammes (ET, OU, NON, mémoires)", "Maîtriser la logique combinatoire puis séquentielle", "Concevoir des GRAFCET séquentiels", "Programmer en Ladder sur automate d'initiation et valider sur maquette"],
     technologies: ["Logigrammes", "Portes logiques", "GRAFCET", "Ladder", "Automate didactique", "Maquettes"],
-    resultats: "Socle de toutes mes compétences en automatisme. Ce module a confirmé mon orientation et m'a fourni les bases pour les projets suivants. En alternance, j'ai ensuite retrouvé cette logique sur des installations réelles, à travers plusieurs générations de logiciels Siemens.",
+    resultats: "Socle de toutes mes compétences en automatisme. Ce module a confirmé mon orientation et m'a fourni les bases pour les projets suivants.",
     competence: "Concevoir — Niveau 1",
     competenceDetail: "Mener une conception partielle intégrant une démarche projet",
-    generations: [
-      { label: "Step 5", year: "1979 — Siemens", desc: "Logiciel historique, encore en service sur quelques installations anciennes du département. La logique s'y lit en liste d'instructions ou en Ladder." },
-      { src: "/projets/siemens-step7-ctemp.jpg", label: "Step 7 — SIMATIC Manager", year: "Génération intermédiaire", desc: "Environnement des automates S7-300/400, très répandu en usine. Ici un bloc de contrôle de température en Ladder (projet sonde PT100, ligne 21)." },
-      { src: "/projets/siemens-tia-portal.jpg", label: "TIA Portal", year: "Génération actuelle", desc: "La plateforme Siemens la plus récente. Ici le séquenceur de la procédure CHAFAB de la ligne 340, consulté sur écran SIMATIC HMI." },
-    ],
+    screenshots: ["/projets/maquette-logigrammes.jpg"],
   },
   {
     tag: "Projet académique — 2ème année",
@@ -1025,35 +1042,6 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 10 }}>Résultats &amp; apports</p>
             <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.7 }}>{project.resultats}</p>
           </div>
-          {project.generations && (
-            <div style={{ marginTop: 16, background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 22px" }}>
-              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 10 }}>Trois générations de logiciels Siemens</p>
-              <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6, marginBottom: 14 }}>
-                De la maquette d'initiation aux installations réelles : en alternance chez Ampère Electricity, plusieurs générations de logiciels Siemens cohabitent sur les lignes. Les pratiquer toutes en dépannage oblige à s'adapter à chaque environnement.
-              </p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-                {project.generations.map((g) => (
-                  <div key={g.label} style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", background: "var(--bg2)" }}>
-                    {g.src ? (
-                      <a href={g.src} target="_blank" rel="noopener noreferrer" style={{ display: "block", aspectRatio: "4/3", overflow: "hidden", background: "#0d1014" }}>
-                        <img src={g.src} alt={g.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      </a>
-                    ) : (
-                      <div style={{ aspectRatio: "4/3", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "#0d1520" }}>
-                        <span className="display" style={{ fontSize: 38, color: "#5080b0", letterSpacing: "0.06em" }}>STEP 5</span>
-                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>Siemens · 1979</span>
-                      </div>
-                    )}
-                    <div style={{ padding: "10px 12px 12px" }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{g.label}</div>
-                      <div style={{ fontSize: 10.5, fontWeight: 600, color: project.color, marginBottom: 5 }}>{g.year}</div>
-                      <p style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.55 }}>{g.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
           {project.screenshots && project.screenshots.length > 0 && (
             <div style={{ marginTop: 16 }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 12 }}>Captures</p>
@@ -1164,221 +1152,9 @@ function Projects() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   INSTALLATION SVG ILLUSTRATIONS
-═══════════════════════════════════════════════════════════ */
-function PresseSVG() {
-  return (
-    <svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", background: "#0d1520" }}>
-      {/* Structure frame */}
-      <rect x="60" y="20" width="360" height="230" rx="4" fill="none" stroke="#2a4060" strokeWidth="2"/>
-      {/* Colonnes */}
-      <rect x="60" y="20" width="30" height="230" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      <rect x="390" y="20" width="30" height="230" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      {/* Traverse haute */}
-      <rect x="60" y="20" width="360" height="40" rx="2" fill="#1e2e44" stroke="#3a5070" strokeWidth="1.5"/>
-      {/* Vérin hydraulique */}
-      <rect x="210" y="60" width="60" height="80" rx="4" fill="#243040" stroke="#3d6090" strokeWidth="1.5"/>
-      <rect x="225" y="55" width="30" height="15" rx="2" fill="#2d7dd2" opacity="0.8"/>
-      <rect x="230" y="70" width="20" height="60" fill="#1a2535" stroke="#3a5070" strokeWidth="1"/>
-      {/* Piston */}
-      <rect x="215" y="140" width="50" height="18" rx="3" fill="#3d6090" stroke="#5080b0" strokeWidth="1.5"/>
-      {/* Outil / matrice */}
-      <path d="M205 158 L275 158 L265 178 L215 178 Z" fill="#2a4060" stroke="#4070a0" strokeWidth="1.5"/>
-      {/* Flan / pièce */}
-      <rect x="150" y="195" width="180" height="12" rx="2" fill="#c0a830" opacity="0.9"/>
-      {/* Table de presse */}
-      <rect x="90" y="207" width="300" height="28" rx="3" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      {/* Pieds */}
-      <rect x="110" y="235" width="20" height="15" fill="#151e2a" stroke="#2a4060" strokeWidth="1"/>
-      <rect x="350" y="235" width="20" height="15" fill="#151e2a" stroke="#2a4060" strokeWidth="1"/>
-      {/* Vérins latéraux */}
-      <rect x="90" y="80" width="14" height="100" rx="3" fill="#1e3048" stroke="#2a5080" strokeWidth="1"/>
-      <rect x="376" y="80" width="14" height="100" rx="3" fill="#1e3048" stroke="#2a5080" strokeWidth="1"/>
-      {/* Panneau de contrôle */}
-      <rect x="320" y="30" width="70" height="28" rx="3" fill="#0e1825" stroke="#2d7dd2" strokeWidth="1"/>
-      <circle cx="335" cy="44" r="5" fill="#40c070" opacity="0.9"/>
-      <circle cx="352" cy="44" r="5" fill="#e04040" opacity="0.9"/>
-      <rect x="362" y="38" width="20" height="12" rx="2" fill="#2d7dd2" opacity="0.6"/>
-      {/* Sonde de température (highlight) */}
-      <circle cx="270" cy="175" r="5" fill="#f0c040" opacity="0.9"/>
-      <line x1="270" y1="175" x2="310" y2="155" stroke="#f0c040" strokeWidth="1.5" strokeDasharray="3 2"/>
-      <text x="314" y="152" fill="#f0c040" fontSize="9" fontFamily="monospace">PT100</text>
-      {/* Labels */}
-      <text x="165" y="265" fill="#4a6080" fontSize="9" fontFamily="sans-serif">PRESSE D'EMBOUTISSAGE</text>
-      <text x="168" y="276" fill="#2d7dd2" fontSize="8" fontFamily="sans-serif">Renault Georges Besse · Douai</text>
-    </svg>
-  );
-}
-
-function LaserSVG() {
-  return (
-    <svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", background: "#0d1520" }}>
-      {/* Bâti machine */}
-      <rect x="40" y="30" width="400" height="200" rx="6" fill="none" stroke="#1e3a50" strokeWidth="2"/>
-      {/* Portique X */}
-      <rect x="40" y="30" width="400" height="20" rx="3" fill="#1a2e44" stroke="#2a4860" strokeWidth="1.5"/>
-      <rect x="40" y="220" width="400" height="10" rx="2" fill="#1a2e44" stroke="#2a4860" strokeWidth="1.5"/>
-      {/* Guides latéraux */}
-      <rect x="40" y="50" width="16" height="170" fill="#152030" stroke="#1e3a50" strokeWidth="1.5"/>
-      <rect x="424" y="50" width="16" height="170" fill="#152030" stroke="#1e3a50" strokeWidth="1.5"/>
-      {/* Rail Y */}
-      <rect x="56" y="105" width="368" height="18" rx="3" fill="#1e3555" stroke="#2e5080" strokeWidth="1.5"/>
-      {/* Tête laser sur rail */}
-      <rect x="200" y="95" width="80" height="38" rx="4" fill="#243050" stroke="#3d70a0" strokeWidth="2"/>
-      <rect x="230" y="133" width="20" height="25" rx="2" fill="#1a2535" stroke="#3d6090" strokeWidth="1.5"/>
-      {/* Faisceau laser */}
-      <line x1="240" y1="158" x2="240" y2="195" stroke="#00d4ff" strokeWidth="2.5" opacity="0.9"/>
-      <ellipse cx="240" cy="197" rx="8" ry="3" fill="#00d4ff" opacity="0.6"/>
-      {/* Étincelles */}
-      <line x1="236" y1="193" x2="226" y2="205" stroke="#ffcc00" strokeWidth="1" opacity="0.8"/>
-      <line x1="244" y1="193" x2="254" y2="202" stroke="#ffcc00" strokeWidth="1" opacity="0.8"/>
-      <line x1="240" y1="194" x2="233" y2="208" stroke="#ff8800" strokeWidth="1" opacity="0.7"/>
-      <line x1="240" y1="194" x2="248" y2="206" stroke="#ff8800" strokeWidth="1" opacity="0.7"/>
-      {/* Pièce à couper */}
-      <rect x="100" y="195" width="280" height="14" rx="2" fill="#2a3a50" stroke="#3a5070" strokeWidth="1"/>
-      <line x1="100" y1="197" x2="380" y2="197" stroke="#4a6080" strokeWidth="0.5"/>
-      {/* Fibre optique */}
-      <path d="M240 95 C240 70 320 70 360 50" fill="none" stroke="#2d7dd2" strokeWidth="2" strokeDasharray="4 3" opacity="0.7"/>
-      {/* Générateur laser */}
-      <rect x="340" y="30" width="80" height="40" rx="3" fill="#0e1825" stroke="#2d7dd2" strokeWidth="1.5"/>
-      <text x="354" y="48" fill="#2d7dd2" fontSize="9" fontFamily="monospace" fontWeight="bold">LASER</text>
-      <text x="352" y="60" fill="#5090c0" fontSize="8" fontFamily="monospace">GENERATOR</text>
-      {/* Capteurs */}
-      <circle cx="80" cy="100" r="6" fill="#40c070" opacity="0.8"/>
-      <circle cx="400" cy="100" r="6" fill="#40c070" opacity="0.8"/>
-      {/* Labels */}
-      <text x="155" y="262" fill="#4a6080" fontSize="9" fontFamily="sans-serif">DÉCOUPE LASER CNC</text>
-      <text x="165" y="273" fill="#2d7dd2" fontSize="8" fontFamily="sans-serif">Renault Georges Besse · Douai</text>
-      {/* Glow effet laser */}
-      <ellipse cx="240" cy="175" rx="4" ry="20" fill="#00d4ff" opacity="0.08"/>
-    </svg>
-  );
-}
-
-function InjectionSVG() {
-  return (
-    <svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", background: "#0d1520" }}>
-      {/* Bâti principal */}
-      <rect x="30" y="60" width="420" height="160" rx="5" fill="none" stroke="#1e3a30" strokeWidth="2"/>
-      {/* Unité d'injection (droite) */}
-      <rect x="300" y="80" width="130" height="60" rx="4" fill="#1a2e24" stroke="#2a4840" strokeWidth="1.5"/>
-      {/* Vis d'injection */}
-      <rect x="310" y="100" width="110" height="18" rx="8" fill="#0e1a14" stroke="#2a5040" strokeWidth="1.5"/>
-      <line x1="325" y1="100" x2="325" y2="118" stroke="#2a5040" strokeWidth="1"/>
-      <line x1="340" y1="100" x2="340" y2="118" stroke="#2a5040" strokeWidth="1"/>
-      <line x1="355" y1="100" x2="355" y2="118" stroke="#2a5040" strokeWidth="1"/>
-      <line x1="370" y1="100" x2="370" y2="118" stroke="#2a5040" strokeWidth="1"/>
-      <line x1="385" y1="100" x2="385" y2="118" stroke="#2a5040" strokeWidth="1"/>
-      {/* Trémie */}
-      <path d="M390 60 L420 60 L410 80 L400 80 Z" fill="#1e3028" stroke="#2a5040" strokeWidth="1.5"/>
-      <rect x="400" y="52" width="15" height="10" rx="2" fill="#152520" stroke="#2a5040" strokeWidth="1"/>
-      {/* Buse d'injection */}
-      <path d="M310 105 L295 109 L295 111 L310 114 Z" fill="#3d8060" stroke="#40c080" strokeWidth="1"/>
-      {/* Unité de fermeture (gauche) */}
-      <rect x="60" y="75" width="220" height="130" rx="4" fill="#152030" stroke="#1e3a40" strokeWidth="1.5"/>
-      {/* Plateau fixe */}
-      <rect x="70" y="85" width="40" height="110" rx="2" fill="#1a2e3a" stroke="#2a4860" strokeWidth="1.5"/>
-      {/* Plateau mobile */}
-      <rect x="155" y="90" width="40" height="100" rx="2" fill="#1e3445" stroke="#2e5070" strokeWidth="1.5"/>
-      {/* Colonnes de guidage */}
-      <line x1="115" y1="95" x2="155" y2="95" stroke="#3a6080" strokeWidth="3"/>
-      <line x1="115" y1="185" x2="155" y2="185" stroke="#3a6080" strokeWidth="3"/>
-      {/* Moule */}
-      <rect x="110" y="110" width="45" height="70" rx="2" fill="#243040" stroke="#3d6080" strokeWidth="2"/>
-      {/* Cavité moule */}
-      <path d="M122 125 L143 125 L143 165 L122 165 Z" fill="#0e1825" stroke="#2a5080" strokeWidth="1"/>
-      {/* Pièce injectée (en cours) */}
-      <path d="M124 127 L141 127 L141 163 L124 163 Z" fill="#e06020" opacity="0.7" rx="1"/>
-      {/* Vérin fermeture */}
-      <rect x="200" y="115" width="60" height="50" rx="3" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      <rect x="195" y="130" width="10" height="20" rx="2" fill="#3d6090" stroke="#4a70a0" strokeWidth="1"/>
-      {/* Panneau de commande */}
-      <rect x="32" y="62" width="85" height="35" rx="3" fill="#0e1825" stroke="#2d7dd2" strokeWidth="1"/>
-      <circle cx="50" cy="72" r="4" fill="#40c070" opacity="0.9"/>
-      <circle cx="65" cy="72" r="4" fill="#f0c040" opacity="0.9"/>
-      <circle cx="80" cy="72" r="4" fill="#e04040" opacity="0.7"/>
-      <rect x="90" y="66" width="22" height="10" rx="2" fill="#1a2535" stroke="#2d7dd2" strokeWidth="1"/>
-      <text x="91" y="74" fill="#2d7dd2" fontSize="7" fontFamily="monospace">IHM</text>
-      {/* Tuyaux hydrauliques */}
-      <path d="M195 140 C180 140 180 220 140 220" fill="none" stroke="#2a5040" strokeWidth="3" opacity="0.6"/>
-      <path d="M195 155 C175 155 175 225 120 225" fill="none" stroke="#2a5040" strokeWidth="3" opacity="0.6"/>
-      {/* Labels */}
-      <text x="135" y="258" fill="#4a6080" fontSize="9" fontFamily="sans-serif">PRESSE À INJECTION PLASTIQUE</text>
-      <text x="148" y="269" fill="#40c080" fontSize="8" fontFamily="sans-serif">Renault Georges Besse · Douai</text>
-    </svg>
-  );
-}
-
-function RetourneurSVG() {
-  return (
-    <svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", background: "#0d1520" }}>
-      {/* Bâti retourneur */}
-      <rect x="50" y="40" width="380" height="190" rx="5" fill="none" stroke="#2a3a50" strokeWidth="2"/>
-      {/* Convoyeur bas */}
-      <rect x="60" y="195" width="360" height="20" rx="3" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      {[80,120,160,200,240,280,320,360,400].map((x, i) => (
-        <ellipse key={i} cx={x} cy={205} rx={8} ry={5} fill="#243050" stroke="#3a5070" strokeWidth="1"/>
-      ))}
-      {/* Convoyeur haut */}
-      <rect x="60" y="55" width="360" height="20" rx="3" fill="#1a2535" stroke="#2a4060" strokeWidth="1.5"/>
-      {[80,120,160,200,240,280,320,360,400].map((x, i) => (
-        <ellipse key={i} cx={x} cy={65} rx={8} ry={5} fill="#243050" stroke="#3a5070" strokeWidth="1"/>
-      ))}
-      {/* Flans sur convoyeur bas (paquets) */}
-      <rect x="90" y="180" width="60" height="14" rx="2" fill="#5a6070" stroke="#7a8090" strokeWidth="1"/>
-      <rect x="90" y="171" width="60" height="10" rx="1" fill="#6a7080" stroke="#8a9090" strokeWidth="1"/>
-      <rect x="90" y="163" width="60" height="9" rx="1" fill="#7a8090" stroke="#9aa0a0" strokeWidth="1"/>
-      {/* Flans retournés sur convoyeur haut */}
-      <rect x="320" y="69" width="60" height="14" rx="2" fill="#7a8090" stroke="#9aa0a0" strokeWidth="1"/>
-      <rect x="320" y="60" width="60" height="10" rx="1" fill="#6a7080" stroke="#8a9090" strokeWidth="1"/>
-      {/* Mécanisme de retournement (centre) */}
-      <ellipse cx="240" cy="130" rx="55" ry="55" fill="none" stroke="#2a4060" strokeWidth="1.5" strokeDasharray="5 3"/>
-      <ellipse cx="240" cy="130" rx="38" ry="38" fill="#1a2535" stroke="#3a5070" strokeWidth="2"/>
-      {/* Bras de préhension */}
-      <rect x="195" y="126" width="90" height="8" rx="4" fill="#243555" stroke="#3d6090" strokeWidth="2"/>
-      <circle cx="240" cy="130" r="8" fill="#2d7dd2" opacity="0.9"/>
-      <circle cx="240" cy="130" r="4" fill="#1a2535"/>
-      {/* Pince gauche */}
-      <rect x="185" y="122" width="14" height="16" rx="3" fill="#2a4060" stroke="#3d6090" strokeWidth="1.5"/>
-      {/* Pince droite */}
-      <rect x="281" y="122" width="14" height="16" rx="3" fill="#2a4060" stroke="#3d6090" strokeWidth="1.5"/>
-      {/* Flèche de rotation */}
-      <path d="M215 95 A35 35 0 0 1 265 95" fill="none" stroke="#2d7dd2" strokeWidth="2" markerEnd="url(#arrow)"/>
-      <defs>
-        <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#2d7dd2"/>
-        </marker>
-      </defs>
-      {/* Éclairage LED (highlight projet) */}
-      <rect x="65" y="100" width="20" height="60" rx="3" fill="#1e2030" stroke="#f0a030" strokeWidth="1.5"/>
-      <rect x="395" y="100" width="20" height="60" rx="3" fill="#1e2030" stroke="#f0a030" strokeWidth="1.5"/>
-      {/* Rayons lumineux */}
-      {[-20,-10,0,10,20].map((dy, i) => (
-        <line key={i} x1="85" y1={130 + dy} x2="105" y2={130 + dy * 0.5} stroke="#f0a030" strokeWidth="0.8" opacity="0.5"/>
-      ))}
-      {[-20,-10,0,10,20].map((dy, i) => (
-        <line key={i} x1="395" y1={130 + dy} x2="375" y2={130 + dy * 0.5} stroke="#f0a030" strokeWidth="0.8" opacity="0.5"/>
-      ))}
-      {/* Radar Sick */}
-      <rect x="210" y="40" width="60" height="14" rx="3" fill="#0e1825" stroke="#f0a030" strokeWidth="1.5"/>
-      <text x="218" y="51" fill="#f0a030" fontSize="8" fontFamily="monospace">RADAR SICK</text>
-      <path d="M220 54 L200 65 M240 54 L240 68 M260 54 L280 65" stroke="#f0a030" strokeWidth="1" opacity="0.6" strokeDasharray="2 2"/>
-      {/* Relais / armoire */}
-      <rect x="410" y="42" width="36" height="50" rx="3" fill="#0e1825" stroke="#2d7dd2" strokeWidth="1.5"/>
-      <text x="415" y="57" fill="#2d7dd2" fontSize="7" fontFamily="monospace">RELAIS</text>
-      <circle cx="418" cy="68" r="4" fill="#40c070" opacity="0.9"/>
-      <circle cx="430" cy="68" r="4" fill="#f0a030" opacity="0.9"/>
-      <rect x="414" y="76" width="24" height="10" rx="2" fill="#1a2535" stroke="#2d7dd2" strokeWidth="1"/>
-      {/* Labels */}
-      <text x="155" y="258" fill="#4a6080" fontSize="9" fontFamily="sans-serif">RETOURNEUR DE FLANS</text>
-      <text x="148" y="269" fill="#f0a030" fontSize="8" fontFamily="sans-serif">Gestion éclairage · Radar Sick · PL7 Pro</text>
-    </svg>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════
-   ALTERNANCE  — installations cliquables avec modales SVG
+   ALTERNANCE  — installations cliquables avec galeries photo/vidéo
 ═══════════════════════════════════════════════════════════ */
 const timelineItems = [
   { period: "Début d'alternance",  title: "Prise en main des installations",   desc: "Découverte de l'environnement Renault Georges Besse à Douai. Apprentissage des procédures de sécurité, des outils et des équipements en place." },
@@ -1388,7 +1164,16 @@ const timelineItems = [
   { period: "Aujourd'hui",         title: "Autonomie progressive",               desc: "Développement de méthodologies de dépannage propres. Intervention croissamment autonome sur des systèmes industriels complexes." },
 ];
 
-type InstallModal = { title: string; subtitle: string; desc: string; svg: React.ReactNode; photos?: string[]; video?: string } | null;
+/* Bloc spécial IHM & automates : comparaison des 3 générations Siemens sur un même besoin
+   (les conditions d'embrayage d'une presse) — le code change, la logique reste. */
+type IhmGen = { label: string; year: string; src: string; alt: string };
+const ihmGenerations: IhmGen[] = [
+  { label: "Step 5", year: "Génération historique · 1979", src: "/projets/siemens-step5-embrayage.jpg", alt: "Conditions d'embrayage sous Step 5 — afficheur Siemens d'origine, format texte" },
+  { label: "Step 7 — SIMATIC Manager", year: "Génération intermédiaire", src: "/projets/siemens-step7-embrayage.jpg", alt: "Conditions d'embrayage sous Step 7 — programme Ladder avec mnémoniques nommés" },
+  { label: "TIA Portal", year: "Génération actuelle", src: "/projets/siemens-tia-embrayage.jpg", alt: "Conditions d'embrayage sous TIA Portal — Ladder structuré avec gestion safety" },
+];
+
+type InstallModal = { title: string; subtitle: string; desc: string; photos?: string[]; videos?: { src: string; label?: string }[]; gallery?: IhmGen[] } | null;
 
 const installations = [
   {
@@ -1398,8 +1183,7 @@ const installations = [
       subtitle: "Renault Georges Besse · Douai",
       desc: "Presses hydrauliques de grande capacité utilisées pour déformer des flans métalliques et leur donner la forme des pièces de carrosserie automobile. Interventions de maintenance sur les systèmes hydrauliques, électriques et sur les automates de commande (Siemens). Projet sonde de température PT100 réalisé sur ce type de machine.",
       photos: ["/projets/presse-emboutissage.jpg", "/projets/emboutissage-flan.jpg", "/projets/emboutissage-piece-finie.jpg"],
-      video: "/projets/emboutissage-ligne522.mp4",
-      svg: <PresseSVG />,
+      videos: [{ src: "/projets/emboutissage-ligne522.mp4", label: "Ligne 522 en production" }],
     },
   },
   {
@@ -1409,7 +1193,7 @@ const installations = [
       subtitle: "Renault Georges Besse · Douai",
       desc: "Centres de découpe laser pilotés par CNC permettant de découper avec précision des pièces métalliques selon des programmes numériques. Maintenance des têtes laser, des systèmes de guidage et des capteurs de positionnement. Interventions sur les programmes automates et les interfaces de supervision.",
       photos: ["/projets/decoupe-laser.jpg"],
-      svg: <LaserSVG />,
+      videos: [{ src: "/projets/decoupe-laser-demo.mp4", label: "Découpe laser en fonctionnement" }],
     },
   },
   {
@@ -1418,8 +1202,7 @@ const installations = [
       title: "Presse à injection plastique",
       subtitle: "Renault Georges Besse · Douai",
       desc: "Machines d'injection plastique permettant de fabriquer des pièces de garniture intérieure automobile par injection de matière thermoplastique dans des moules. Maintenance des systèmes hydrauliques de fermeture, des unités d'injection, des systèmes de régulation thermique et des automates de commande.",
-      video: "/projets/injection-demo.mp4",
-      svg: <InjectionSVG />,
+      videos: [{ src: "/projets/injection-demo.mp4", label: "Cycle d'injection observé en production" }],
     },
   },
   {
@@ -1429,13 +1212,18 @@ const installations = [
       subtitle: "Projet éclairage · Radar Sick · PL7 Pro",
       desc: "Installation permettant de retourner des paquets de flans (état précédent d'une pièce de carrosserie) entre deux convoyeurs. Projet personnel : conception et réalisation d'un système de gestion d'économie d'énergie sur l'éclairage via un radar de présence Sick, modification du programme PL7 Pro et câblage d'un relais.",
       photos: ["/projets/retourneur-photo.jpg"],
-      video: "/projets/retourneur-demo.mp4",
-      svg: <RetourneurSVG />,
+      videos: [{ src: "/projets/retourneur-demo.mp4", label: "Démonstration du système d'économie d'énergie" }],
     },
   },
   {
     icon: "🖥️", label: "IHM & automates",
-    modal: null,
+    modal: {
+      title: "IHM & automates Siemens",
+      subtitle: "Trois générations sur un même métier",
+      desc: "Au département emboutissage, plusieurs générations de logiciels Siemens cohabitent sur les lignes. À chaque intervention, je peux me retrouver face à Step 5 sur un afficheur d'origine, Step 7 / SIMATIC Manager sur les S7-300/400, ou TIA Portal sur les installations récentes. La logique métier reste la même — ici les conditions d'embrayage d'une presse, comparées d'un environnement à l'autre. Savoir naviguer entre ces trois mondes fait partie du quotidien.",
+      gallery: ihmGenerations,
+      photos: ["/projets/siemens-tia-chafab.jpg", "/projets/siemens-step7-cpu.jpg"],
+    },
   },
 ];
 
@@ -1487,7 +1275,7 @@ function Alternance() {
                     <span style={{ flex: 1, textAlign: "left" }}>{m.label}</span>
                     {m.modal && (
                       <>
-                        <span style={{ fontSize: 11, color: "var(--blue)", opacity: 0.7 }}>Voir le schéma</span>
+                        <span style={{ fontSize: 11, color: "var(--blue)", opacity: 0.7 }}>Voir le détail</span>
                         <ArrowRight size={15} className="install-arrow" />
                       </>
                     )}
@@ -1530,6 +1318,28 @@ function Alternance() {
             <div className="modal-body">
               <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.8, marginBottom: 24 }}>{installModal.desc}</p>
 
+              {installModal.gallery && installModal.gallery.length > 0 && (
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--blue)", marginBottom: 12 }}>Conditions d'embrayage — même fonction, trois générations</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
+                    {installModal.gallery.map((g) => (
+                      <div key={g.label} style={{ border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden", background: "var(--bg3)" }}>
+                        <a href={g.src} target="_blank" rel="noopener noreferrer" title="Ouvrir l'image en taille réelle" style={{ display: "block", aspectRatio: "16/10", overflow: "hidden", background: "#0d1014" }}>
+                          <img src={g.src} alt={g.alt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        </a>
+                        <div style={{ padding: "12px 16px 14px" }}>
+                          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{g.label}</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--blue)" }}>{g.year}</span>
+                          </div>
+                          <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4, lineHeight: 1.55 }}>{g.alt}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {installModal.photos && installModal.photos.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
                   {installModal.photos.map((src, i) => (
@@ -1540,17 +1350,16 @@ function Alternance() {
                 </div>
               )}
 
-              {installModal.video && (
-                <video src={installModal.video} controls preload="metadata" playsInline style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)", background: "#000", marginBottom: 20, display: "block" }} />
+              {installModal.videos && installModal.videos.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 14, marginBottom: 4 }}>
+                  {installModal.videos.map((v, i) => (
+                    <div key={i}>
+                      <video src={v.src} controls preload="metadata" playsInline style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)", background: "#000", display: "block" }} />
+                      {v.label && <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{v.label}</p>}
+                    </div>
+                  ))}
+                </div>
               )}
-
-              {/* Schéma de principe */}
-              <div style={{ width: "100%", borderRadius: 16, overflow: "hidden", border: "1px solid var(--border)", aspectRatio: "16/9" }}>
-                {installModal.svg}
-              </div>
-              <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10, fontStyle: "italic", opacity: 0.7 }}>
-                Schéma de principe de l'installation.
-              </p>
             </div>
           </div>
         </div>
@@ -1599,39 +1408,46 @@ function playF1() {
   });
 }
 
-/* Musculation — la barre qui claque au sol : impact sourd + résonances métalliques, double rebond */
+/* Musculation — succession de reps : 4 impacts rythmés (effort grognant + percussion), façon série de pompes */
 function playMuscu() {
   const ctx = getAudioCtx(); if (!ctx) return;
-  const t0 = ctx.currentTime;
-  const clank = (t: number, vol: number, mult: number) => {
-    const dur = 0.35;
+  const t0 = ctx.currentTime + 0.02;
+  const rep = (t: number, idx: number) => {
+    /* effort vocalisé (grognement) : noise filtré bandpass montant */
+    const dur = 0.32;
     const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(i / d.length < 0.5 ? i / d.length * 2 : 2 - i / d.length * 2, 1.5);
     const src = ctx.createBufferSource(); src.buffer = buf;
-    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2600 * mult; bp.Q.value = 0.9;
-    const g = ctx.createGain(); g.gain.value = vol;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 4.2;
+    bp.frequency.setValueAtTime(220 + idx * 30, t);
+    bp.frequency.exponentialRampToValueAtTime(540 + idx * 60, t + dur);
+    const g = ctx.createGain(); g.gain.value = 0.32;
     src.connect(bp); bp.connect(g); g.connect(ctx.destination);
     src.start(t);
-    [2730, 4170, 6310].forEach((f, i) => {
-      const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f * mult;
-      const og = ctx.createGain();
-      og.gain.setValueAtTime(vol * 0.25 / (i + 1), t);
-      og.gain.exponentialRampToValueAtTime(0.0001, t + 0.45 + i * 0.12);
-      o.connect(og); og.connect(ctx.destination);
-      o.start(t); o.stop(t + 0.8);
-    });
+    /* impact mat (poids qui touche) : sinus 75 Hz qui descend */
     const thud = ctx.createOscillator(); thud.type = "sine";
-    thud.frequency.setValueAtTime(95 * mult, t);
-    thud.frequency.exponentialRampToValueAtTime(38, t + 0.18);
+    thud.frequency.setValueAtTime(85, t + 0.15);
+    thud.frequency.exponentialRampToValueAtTime(38, t + 0.32);
     const tg = ctx.createGain();
-    tg.gain.setValueAtTime(vol * 1.5, t);
-    tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    tg.gain.setValueAtTime(0.38, t + 0.15);
+    tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
     thud.connect(tg); tg.connect(ctx.destination);
-    thud.start(t); thud.stop(t + 0.35);
+    thud.start(t + 0.15); thud.stop(t + 0.42);
   };
-  clank(t0, 0.28, 1);
-  clank(t0 + 0.22, 0.15, 1.18);
+  /* 4 reps, accélération progressive (l'effort monte) */
+  [0, 0.42, 0.78, 1.10].forEach((dt, i) => rep(t0 + dt, i));
+  /* coup de gong final pour marquer la dernière rep réussie */
+  const tFinal = t0 + 1.32;
+  ([220, 330, 550] as number[]).forEach((f, i) => {
+    const o = ctx.createOscillator(); o.type = i === 0 ? "sine" : "triangle"; o.frequency.value = f;
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(0.0001, tFinal);
+    og.gain.exponentialRampToValueAtTime(0.16 / (i + 1), tFinal + 0.02);
+    og.gain.exponentialRampToValueAtTime(0.0001, tFinal + 1.3);
+    o.connect(og); og.connect(ctx.destination);
+    o.start(tFinal); o.stop(tFinal + 1.4);
+  });
 }
 
 /* Jeux vidéo — jingle « secret découvert » de Zelda, son 8-bit (onde carrée) */
@@ -1666,59 +1482,87 @@ function playZelda() {
   o2.start(tl); o2.stop(tl + 1);
 }
 
-/* Lecture & Mangas — rasengan : souffle tourbillonnant qui accélère + nappe d'énergie montante */
-function playRasengan() {
+/* Lecture & Mangas — Super Saiyan 2 : montée d'aura (drone qui monte) + crépitements d'éclairs + flash final */
+function playSSJ2() {
   const ctx = getAudioCtx(); if (!ctx) return;
   const t = ctx.currentTime;
-  const dur = 1.8;
+  const dur = 2.6;
+  /* 1. Drone d'aura : trois sinus harmoniques qui montent en fréquence et en volume */
+  ([110, 165, 220] as number[]).forEach((f0, i) => {
+    const o = ctx.createOscillator(); o.type = i === 2 ? "sawtooth" : "sine";
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f0 * 3.2, t + dur - 0.3);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.07 / (i + 1), t + 0.5);
+    g.gain.setValueAtTime(0.07 / (i + 1), t + dur - 0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const filter = ctx.createBiquadFilter(); filter.type = "lowpass";
+    filter.frequency.setValueAtTime(800, t);
+    filter.frequency.exponentialRampToValueAtTime(5000, t + dur - 0.3);
+    o.connect(filter); filter.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur);
+  });
+  /* 2. Souffle de l'aura : noise bandpass qui « respire » */
   const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
   const d = buf.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   const src = ctx.createBufferSource(); src.buffer = buf;
-  const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 2.2;
-  bp.frequency.setValueAtTime(350, t);
-  bp.frequency.exponentialRampToValueAtTime(2600, t + dur);
+  const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 1.8;
+  bp.frequency.setValueAtTime(600, t);
+  bp.frequency.exponentialRampToValueAtTime(2400, t + dur - 0.3);
   const lfo = ctx.createOscillator();
-  lfo.frequency.setValueAtTime(7, t);
-  lfo.frequency.linearRampToValueAtTime(19, t + dur);
-  const lfoG = ctx.createGain(); lfoG.gain.value = 260;
+  lfo.frequency.setValueAtTime(4, t);
+  lfo.frequency.linearRampToValueAtTime(11, t + dur);
+  const lfoG = ctx.createGain(); lfoG.gain.value = 320;
   lfo.connect(lfoG); lfoG.connect(bp.frequency);
-  const g = ctx.createGain();
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.19, t + 0.45);
-  g.gain.setValueAtTime(0.19, t + dur - 0.4);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  src.connect(bp); bp.connect(g); g.connect(ctx.destination);
-  const o = ctx.createOscillator(); o.type = "sine";
-  o.frequency.setValueAtTime(150, t);
-  o.frequency.exponentialRampToValueAtTime(620, t + dur);
-  const og = ctx.createGain();
-  og.gain.setValueAtTime(0.0001, t);
-  og.gain.exponentialRampToValueAtTime(0.055, t + 0.4);
-  og.gain.setValueAtTime(0.055, t + dur - 0.5);
-  og.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(og); og.connect(ctx.destination);
-  lfo.start(t); src.start(t); o.start(t);
-  lfo.stop(t + dur); o.stop(t + dur);
+  const sg = ctx.createGain();
+  sg.gain.setValueAtTime(0.0001, t);
+  sg.gain.exponentialRampToValueAtTime(0.14, t + 0.6);
+  sg.gain.setValueAtTime(0.14, t + dur - 0.7);
+  sg.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(bp); bp.connect(sg); sg.connect(ctx.destination);
+  src.start(t); lfo.start(t); lfo.stop(t + dur);
+  /* 3. Crépitements d'éclairs : burst de noise très court à des moments précis */
+  [0.55, 0.95, 1.25, 1.55, 1.85, 2.10].forEach((dt) => {
+    const cb = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.12), ctx.sampleRate);
+    const cd = cb.getChannelData(0);
+    for (let i = 0; i < cd.length; i++) cd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / cd.length, 3);
+    const cs = ctx.createBufferSource(); cs.buffer = cb;
+    const cf = ctx.createBiquadFilter(); cf.type = "highpass"; cf.frequency.value = 2800;
+    const cg = ctx.createGain(); cg.gain.value = 0.16;
+    cs.connect(cf); cf.connect(cg); cg.connect(ctx.destination);
+    cs.start(t + dt);
+  });
+  /* 4. Flash final : sub-boom + cymbale courte */
+  const tFinal = t + dur - 0.05;
+  const boom = ctx.createOscillator(); boom.type = "sine";
+  boom.frequency.setValueAtTime(180, tFinal);
+  boom.frequency.exponentialRampToValueAtTime(45, tFinal + 0.5);
+  const bg = ctx.createGain();
+  bg.gain.setValueAtTime(0.32, tFinal);
+  bg.gain.exponentialRampToValueAtTime(0.0001, tFinal + 0.7);
+  boom.connect(bg); bg.connect(ctx.destination);
+  boom.start(tFinal); boom.stop(tFinal + 0.75);
 }
 
 /* ═══════════════════════════════════════════════════════════
    LOISIRS
 ═══════════════════════════════════════════════════════════ */
-type LoisirFx = "f1" | "muscu" | "zelda" | "rasengan";
+type LoisirFx = "f1" | "muscu" | "zelda" | "ssj2";
 
 const FX_SOUNDS: Record<LoisirFx, { play: () => void; duration: number }> = {
-  f1:       { play: playF1,       duration: 2300 },
-  muscu:    { play: playMuscu,    duration: 950 },
-  zelda:    { play: playZelda,    duration: 2100 },
-  rasengan: { play: playRasengan, duration: 1900 },
+  f1:    { play: playF1,    duration: 2300 },
+  muscu: { play: playMuscu, duration: 2400 },
+  zelda: { play: playZelda, duration: 2100 },
+  ssj2:  { play: playSSJ2,  duration: 2700 },
 };
 
 const loisirs: { icon: string; title: string; desc: string; tags: string[]; color: string; fx: LoisirFx; sonHint: string }[] = [
   { icon: "🏎️", title: "Formule 1", desc: "Je suis de près la F1 depuis plusieurs années, notamment les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030", fx: "f1", sonHint: "Montée en régime" },
-  { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2", fx: "muscu", sonHint: "Fin de série" },
+  { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2", fx: "muscu", sonHint: "Série de reps" },
   { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0", fx: "zelda", sonHint: "Un secret bien connu" },
-  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "rasengan", sonHint: "Tourbillon de chakra" },
+  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "ssj2", sonHint: "Montée en puissance" },
 ];
 
 function F1Fx() {
@@ -1732,9 +1576,21 @@ function F1Fx() {
 }
 
 function MuscuFx() {
+  /* Compteur de reps qui apparaît à chaque rep audio (0.42s d'écart, voir playMuscu) */
   return (
-    <div className="fx-overlay" style={{ background: "transparent", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxOverlayFade 0.95s ease forwards" }}>
-      <span style={{ fontSize: 58, animation: "fxDrop 0.9s cubic-bezier(.34,1.4,.4,1) both" }}>🏋️</span>
+    <div className="fx-overlay" style={{ background: "rgba(10,12,14,0.4)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)", animation: "fxOverlayFade 2.4s ease forwards", flexDirection: "column", gap: 4 }}>
+      <div style={{ position: "relative", width: 110, height: 110 }}>
+        {[1, 2, 3, 4].map((n, i) => (
+          <div key={n} style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Bebas Neue', sans-serif", fontSize: 96, color: "#2d7dd2", letterSpacing: "0.04em", textShadow: "0 0 24px rgba(45,125,210,0.65)", animation: `fxRep 0.42s cubic-bezier(.34,1.6,.5,1) both`, animationDelay: `${i * 0.42}s` }}>
+            {n}
+          </div>
+        ))}
+        {/* Mention « FLEX! » sur la dernière rep */}
+        <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: "#fff", letterSpacing: "0.12em", textShadow: "0 0 18px rgba(45,125,210,0.9), 0 4px 10px rgba(0,0,0,0.7)", animation: "fxFlex 0.9s cubic-bezier(.22,1,.36,1) both", animationDelay: "1.55s", whiteSpace: "nowrap" }}>
+          FLEX !
+        </div>
+      </div>
+      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "0.3em", color: "var(--accent)", marginTop: 10 }}>SÉRIE COMPLÈTE</span>
     </div>
   );
 }
@@ -1751,13 +1607,54 @@ function TriforceFx() {
   );
 }
 
-function RasenganFx() {
+function SSJ2Fx() {
+  /* Aura SSJ2 : halo jaune autour de la carte + langues de flamme qui jaillissent
+     du sol vers le haut + éclairs bleus qui crépitent. Bordure dorée pulsante. */
+  const flames = [
+    { left: "5%",  delay: 0.05, scale: 1.0,  hue: "#ffe060" },
+    { left: "18%", delay: 0.2,  scale: 0.85, hue: "#ffc830" },
+    { left: "32%", delay: 0.0,  scale: 1.1,  hue: "#ffd848" },
+    { left: "46%", delay: 0.35, scale: 0.95, hue: "#ffb820" },
+    { left: "60%", delay: 0.1,  scale: 1.05, hue: "#ffd040" },
+    { left: "74%", delay: 0.3,  scale: 0.9,  hue: "#ffc638" },
+    { left: "88%", delay: 0.15, scale: 1.0,  hue: "#ffe068" },
+  ];
   return (
-    <div className="fx-overlay" style={{ animation: "fxOverlayFade 1.9s ease forwards" }}>
-      <div style={{ position: "relative", width: 110, height: 110, animation: "fxOrbPulse 1.9s cubic-bezier(.22,1,.36,1) both" }}>
-        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle at 38% 35%, #e8f4ff 0%, #8cc6ff 30%, #2d7dd2 62%, rgba(20,60,140,0.4) 82%, transparent 100%)", boxShadow: "0 0 50px rgba(74,150,240,0.9), 0 0 110px rgba(45,125,210,0.5)" }} />
-        <div style={{ position: "absolute", inset: 6, borderRadius: "50%", background: "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.85) 18deg, transparent 60deg, transparent 120deg, rgba(255,255,255,0.6) 150deg, transparent 200deg, transparent 250deg, rgba(255,255,255,0.7) 285deg, transparent 330deg)", animation: "fxOrbSpin 1.9s cubic-bezier(.3,.2,.2,1) both", opacity: 0.8, mixBlendMode: "screen" }} />
-        <div style={{ position: "absolute", inset: 32, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.95), rgba(180,220,255,0.3) 70%, transparent)" }} />
+    <div className="fx-overlay" style={{ background: "radial-gradient(ellipse at center bottom, rgba(255,200,40,0.32) 0%, rgba(255,160,30,0.15) 40%, transparent 75%)", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxAuraFlicker 2.6s cubic-bezier(.5,0,.5,1) forwards", overflow: "hidden" }}>
+      {/* Halo doré rayonnant */}
+      <div style={{ position: "absolute", inset: "-20%", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,220,80,0.45) 0%, rgba(255,170,40,0.25) 30%, transparent 65%)", filter: "blur(20px)", animation: "fxAuraFlicker 2.6s ease-in-out infinite" }} />
+
+      {/* Langues de flammes jaunes qui montent depuis le bas */}
+      {flames.map((f, i) => (
+        <div key={i} style={{
+          position: "absolute",
+          left: f.left, bottom: "-10%",
+          width: 36 * f.scale, height: 90 * f.scale,
+          background: `radial-gradient(ellipse at 50% 100%, ${f.hue} 0%, rgba(255,170,30,0.7) 45%, rgba(255,120,20,0) 90%)`,
+          filter: "blur(2px)",
+          borderRadius: "50% 50% 30% 30% / 70% 70% 30% 30%",
+          mixBlendMode: "screen",
+          animation: "fxAuraTongue 1.2s cubic-bezier(.55,.1,.7,.9) both infinite",
+          animationDelay: `${f.delay}s`,
+        }} />
+      ))}
+
+      {/* Éclairs bleus SSJ2 — 3 traits zigzag qui crépitent */}
+      <svg viewBox="0 0 200 200" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", animation: "fxBoltFlash 2.6s linear forwards" }}>
+        <defs>
+          <filter id="boltGlow">
+            <feGaussianBlur stdDeviation="2.2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M40,15 L48,65 L36,68 L60,140 L52,90 L66,86 L42,18" stroke="#9fdcff" strokeWidth="1.6" fill="none" filter="url(#boltGlow)" opacity="0.9" />
+        <path d="M160,28 L150,72 L168,78 L142,150 L158,110 L142,104 L162,30" stroke="#bdebff" strokeWidth="1.6" fill="none" filter="url(#boltGlow)" opacity="0.9" />
+        <path d="M100,5 L95,42 L108,46 L92,95 L104,60 L96,58 L102,8" stroke="#ffffff" strokeWidth="1.4" fill="none" filter="url(#boltGlow)" opacity="0.95" />
+      </svg>
+
+      {/* Symbole kanji énergie au centre, en surbrillance */}
+      <div style={{ position: "relative", zIndex: 2, fontFamily: "'Bebas Neue', sans-serif", fontSize: 64, color: "#fff8c0", letterSpacing: "0.08em", textShadow: "0 0 18px #ffd848, 0 0 40px #ffaa20, 0 0 80px rgba(255,170,30,0.7)", animation: "fxAuraFlicker 0.8s ease-in-out infinite alternate" }}>
+        力
       </div>
     </div>
   );
@@ -1791,30 +1688,34 @@ function Loisirs() {
         </p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
-        {loisirs.map((l, i) => (
-          <div
-            key={l.title}
-            className={`loisir-card reveal reveal-delay-${(i % 4) + 1}${activeFx === "muscu" && l.fx === "muscu" ? " fx-shake" : ""}`}
-            style={{ borderTop: `2px solid ${l.color}60` }}
-            onClick={() => trigger(l.fx)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && trigger(l.fx)}
-            aria-label={`${l.title} — jouer l'ambiance sonore`}
-          >
-            <span className="loisir-icon">{l.icon}</span>
-            <div className="loisir-sound-badge"><Volume2 size={13} /> {l.sonHint}</div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>{l.title}</h3>
-            <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{l.desc}</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {l.tags.map((t) => <span key={t} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${l.color}40`, fontSize: 11, color: l.color, background: `${l.color}10` }}>{t}</span>)}
+        {loisirs.map((l, i) => {
+          const isPump = activeFx === "muscu" && l.fx === "muscu";
+          const isAura = activeFx === "ssj2" && l.fx === "ssj2";
+          return (
+            <div
+              key={l.title}
+              className={`loisir-card reveal reveal-delay-${(i % 4) + 1}${isPump ? " fx-pump" : ""}${isAura ? " fx-ssj2" : ""}`}
+              style={{ borderTop: `2px solid ${l.color}60` }}
+              onClick={() => trigger(l.fx)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && trigger(l.fx)}
+              aria-label={`${l.title} — jouer l'ambiance sonore`}
+            >
+              <span className="loisir-icon">{l.icon}</span>
+              <div className="loisir-sound-badge"><Volume2 size={13} /> {l.sonHint}</div>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>{l.title}</h3>
+              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{l.desc}</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {l.tags.map((t) => <span key={t} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${l.color}40`, fontSize: 11, color: l.color, background: `${l.color}10` }}>{t}</span>)}
+              </div>
+              {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
+              {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
+              {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
+              {activeFx === l.fx && l.fx === "ssj2" && <SSJ2Fx />}
             </div>
-            {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
-            {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
-            {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
-            {activeFx === l.fx && l.fx === "rasengan" && <RasenganFx />}
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="reveal" style={{ marginTop: 60, display: "flex", gap: 16, flexWrap: "wrap" }}>
         {[
