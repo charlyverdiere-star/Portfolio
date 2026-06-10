@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Cpu, Wrench, Network, Code2, Zap, ChevronDown,
   Mail, Linkedin, Github, Download, ArrowRight,
   Activity, Settings, BookOpen, X, ExternalLink,
-  Target, GraduationCap, Heart,
+  Target, GraduationCap, Heart, Volume2,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════
@@ -27,7 +27,7 @@ const globalStyles = `
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; background: var(--bg); }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6; overflow-x: hidden; }
 
   body::before {
@@ -76,10 +76,13 @@ const globalStyles = `
   .scan-line { position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(45,125,210,0.3), transparent); animation: scan 6s linear infinite; pointer-events: none; }
 
   /* ── NAVBAR ── */
+  /* env(safe-area-inset-top) : la navbar couvre la zone status bar iOS (viewport-fit=cover) */
   .navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 5%; height: 68px;
+    padding-top: env(safe-area-inset-top, 0px);
+    height: calc(68px + env(safe-area-inset-top, 0px));
     transition: background 0.4s, border-color 0.4s;
     border-bottom: 1px solid transparent;
   }
@@ -175,9 +178,35 @@ const globalStyles = `
   .install-card:hover .install-arrow { opacity: 1; transform: translateX(3px); }
 
   /* LOISIR CARD */
-  .loisir-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 32px; transition: border-color 0.3s, transform 0.3s; }
+  .loisir-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 32px; transition: border-color 0.3s, transform 0.3s; position: relative; overflow: hidden; cursor: pointer; }
   .loisir-card:hover { border-color: rgba(45,125,210,0.25); transform: translateY(-4px); }
   .loisir-icon { font-size: 44px; margin-bottom: 16px; display: block; }
+  .loisir-sound-badge { position: absolute; top: 18px; right: 20px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); opacity: 0.55; transition: opacity 0.2s, color 0.2s; }
+  .loisir-card:hover .loisir-sound-badge { opacity: 1; color: var(--blue); }
+
+  /* ── FX LOISIRS (déclenchés au clic, avec le son) ── */
+  .fx-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(10,12,14,0.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); z-index: 5; border-radius: inherit; }
+  @keyframes fxOverlayFade { 0% { opacity: 0; } 10% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* Formule 1 — lignes de vitesse */
+  @keyframes fxDash { from { transform: translateX(-140%); } to { transform: translateX(560%); } }
+  .fx-f1-line { position: absolute; left: 0; height: 2px; width: 30%; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(232,48,48,0.9), transparent); animation: fxDash 0.45s linear infinite; }
+
+  /* Musculation — impact de la barre */
+  @keyframes fxShake { 0%, 100% { transform: none; } 15% { transform: translateY(8px) rotate(-0.7deg); } 30% { transform: translateY(-3px) rotate(0.4deg); } 45% { transform: translateY(5px); } 60% { transform: translateY(-2px); } 75% { transform: translateY(2px); } }
+  .loisir-card.fx-shake { animation: fxShake 0.6s cubic-bezier(.25,.85,.35,1); }
+  @keyframes fxDrop { 0% { transform: translateY(-90px) ; opacity: 0; } 40% { transform: translateY(10px); opacity: 1; } 58% { transform: translateY(-7px); } 74% { transform: translateY(3px); } 100% { transform: translateY(0); opacity: 0.9; } }
+
+  /* Zelda — triforce qui s'assemble */
+  @keyframes fxTriIn1 { from { transform: translate(-80px, -70px) rotate(-160deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
+  @keyframes fxTriIn2 { from { transform: translate(80px, -70px) rotate(160deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
+  @keyframes fxTriIn3 { from { transform: translate(0, 85px) rotate(200deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
+  @keyframes fxTriGlow { 0%, 55% { filter: drop-shadow(0 0 5px rgba(255,216,96,0.5)); } 78% { filter: drop-shadow(0 0 22px rgba(255,216,96,1)); } 100% { filter: drop-shadow(0 0 10px rgba(255,216,96,0.7)); } }
+  .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; }
+
+  /* Rasengan — orbe de chakra */
+  @keyframes fxOrbPulse { 0% { transform: scale(0.1); opacity: 0; } 25% { opacity: 1; } 72% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+  @keyframes fxOrbSpin { from { transform: rotate(0deg); } to { transform: rotate(900deg); } }
 
   /* CONTACT */
   .contact-link { display: flex; align-items: center; gap: 20px; padding: 24px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; color: var(--text); transition: border-color 0.3s, transform 0.3s, background 0.3s; }
@@ -192,11 +221,15 @@ const globalStyles = `
   .hero-word { display: inline-block; animation: fadeUp 0.8s cubic-bezier(.22,1,.36,1) both; }
   @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
-  /* Hero mobile fix */
+  /* Fondu en bas du hero : transition douce vers la section suivante */
+  .hero-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: linear-gradient(to bottom, transparent, var(--bg)); pointer-events: none; }
+
+  /* Hero mobile fix — 100lvh : le fond couvre tout l'écran, y compris derrière les barres Safari */
   @media (max-width: 600px) {
     #accueil {
-      min-height: 100svh !important;
-      padding-top: 90px !important;
+      min-height: 100vh !important;
+      min-height: 100lvh !important;
+      padding-top: calc(90px + env(safe-area-inset-top, 0px)) !important;
       padding-bottom: 80px !important;
       justify-content: flex-start !important;
     }
@@ -291,7 +324,10 @@ function useSkillBars() {
 function scrollTo(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
+  // hauteur réelle de la navbar (68px + safe-area iOS éventuelle)
+  const nav = document.querySelector(".navbar");
+  const offset = (nav ? nav.getBoundingClientRect().height : 68) + 4;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: "smooth" });
 }
 
 function useActiveSection() {
@@ -440,15 +476,16 @@ function Hero() {
       <div className="scan-line" />
       <div className="glow-circle" style={{ width: 700, height: 700, background: "rgba(45,125,210,0.07)", top: -200, left: "40%" }} />
       <div className="glow-circle" style={{ width: 400, height: 400, background: "rgba(100,160,240,0.05)", bottom: 0, right: "10%" }} />
+      <div className="hero-fade" />
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1100 }}>
         <div className="label" style={{ animation: "fadeUp 0.6s both" }}>BUT GEII — Automatisme &amp; Informatique Industrielle</div>
         <h1 className="display" style={{ fontSize: "clamp(56px, 10vw, 160px)", color: "#fff", marginBottom: 24 }}>
           {"Charly".split("").map((c, i) => <span key={i} className="hero-word" style={{ animationDelay: `${0.05 * i + 0.2}s` }}>{c}</span>)}
           <br />
-          <span style={{ color: "var(--blue)", opacity: 0.9 }}>
+          <span style={{ color: "var(--blue)", opacity: 0.9, whiteSpace: "nowrap" }}>
             {"VERDIERE".split("").map((c, i) => <span key={i} className="hero-word" style={{ animationDelay: `${0.04 * i + 0.7}s` }}>{c}</span>)}
           </span>
-          <span style={{ color: "var(--muted)" }}>
+          <span style={{ color: "var(--muted)", whiteSpace: "nowrap" }}>
             {"‑PARENT".split("").map((c, i) => <span key={i} className="hero-word" style={{ animationDelay: `${0.04 * i + 1.0}s` }}>{c}</span>)}
           </span>
         </h1>
@@ -559,27 +596,30 @@ function About() {
       {/* ── Main layout: photo + story ── */}
       <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 60, alignItems: "start", marginBottom: 64 }}>
 
-        {/* Photo placeholder */}
+        {/* Carte identité — monogramme (pas de photo, choix assumé) */}
         <div className="reveal about-photo-col">
           <div style={{
             width: "100%", aspectRatio: "3/4",
-            background: "var(--bg2)",
+            background: "linear-gradient(160deg, var(--bg2) 0%, #11161c 100%)",
             border: "1px solid var(--border)",
             borderRadius: 20,
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center",
-            gap: 12, color: "var(--muted)",
+            gap: 10, color: "var(--muted)",
             position: "relative", overflow: "hidden",
           }}>
             {/* Circuit bg */}
-            <svg width="100%" height="100%" viewBox="0 0 200 267" style={{ position: "absolute", inset: 0, opacity: 0.04 }}>
+            <svg width="100%" height="100%" viewBox="0 0 200 267" style={{ position: "absolute", inset: 0, opacity: 0.1 }}>
               <circle cx="100" cy="133" r="80" stroke="#2d7dd2" strokeWidth="1" fill="none" strokeDasharray="4 6"/>
               <path d="M20 133h30l15-25h30l15 25h30" stroke="#2d7dd2" strokeWidth="0.8" fill="none"/>
               <path d="M100 50v30l20 10v20l-20 10v30" stroke="#2d7dd2" strokeWidth="0.8" fill="none"/>
+              <circle cx="50" cy="108" r="3" fill="#2d7dd2"/>
+              <circle cx="150" cy="133" r="3" fill="#2d7dd2"/>
+              <circle cx="100" cy="80" r="3" fill="#2d7dd2"/>
             </svg>
-            <div style={{ fontSize: 48, position: "relative" }}>👤</div>
-            <span style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", padding: "0 20px", position: "relative" }}>
-              Photo à venir
+            <div className="display" style={{ fontSize: 88, color: "var(--blue)", letterSpacing: "0.05em", position: "relative", textShadow: "0 0 50px rgba(45,125,210,0.45)", lineHeight: 1 }}>CVP</div>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--muted)", position: "relative" }}>
+              Automatisme · GEII
             </span>
             {/* Name tag */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px 20px", background: "linear-gradient(to top, rgba(14,16,18,0.95), transparent)" }}>
@@ -590,7 +630,7 @@ function About() {
 
           {/* Stats sous la photo */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
-            {[{ num: "5", label: "Projets" }, { num: "840", label: "TOEIC" }].map((s) => (
+            {[{ num: "6", label: "Projets" }, { num: "840", label: "TOEIC" }].map((s) => (
               <div key={s.label} className="stat-box" style={{ padding: "18px 12px" }}>
                 <div className="stat-num" style={{ fontSize: 36 }}>{s.num}</div>
                 <div className="stat-label">{s.label}</div>
@@ -805,23 +845,30 @@ type Project = {
   screenshots?: string[];
   videos?: { src: string; label?: string }[];
   ressources?: { label: string; href: string }[];
+  /* Galerie « générations de logiciels » : entrée sans src = tuile typographique */
+  generations?: { src?: string; label: string; year: string; desc: string }[];
 };
 
 const projects: Project[] = [
   {
     tag: "Formation — 1ère année",
     title: "Découverte de l'automatisme",
-    desc: "Initiation aux logigrammes, portes logiques, GRAFCET et langage Ladder sur maquettes industrielles.",
+    desc: "Apprentissage sur maquettes à logigrammes : portes logiques câblées physiquement, puis GRAFCET et langage Ladder sur automate.",
     icon: "🔌",
     bg: "linear-gradient(135deg, #0e1a14 0%, #162a1e 100%)",
-    highlights: ["GRAFCET", "Ladder", "Logigrammes", "Maquettes"],
+    highlights: ["Logigrammes", "Portes logiques", "GRAFCET", "Ladder"],
     color: "#40c070",
-    context: "Premier module d'automatisme du BUT GEII, et mon premier vrai contact avec les systèmes automatisés : le passage de la théorie à la pratique sur des maquettes industrielles.",
-    objectifs: ["Maîtriser la logique câblée et les logigrammes", "Concevoir des GRAFCET séquentiels", "Programmer en Ladder sur automate d'initiation", "Valider les programmes sur maquettes industrielles"],
-    technologies: ["GRAFCET", "Ladder", "Logigrammes", "Portes logiques", "Automate didactique", "Maquettes"],
-    resultats: "Socle de toutes mes compétences en automatisme. Ce module a confirmé mon orientation et m'a fourni les bases pour les projets suivants.",
+    context: "Premier module d'automatisme du BUT GEII, et mon premier vrai contact avec les systèmes automatisés. Tout a commencé sur des maquettes à logigrammes : des platines sur lesquelles on câble physiquement des portes logiques (ET, OU, NON, mémoires) pour construire la logique d'un automatisme. C'est sur ces maquettes que j'ai appris à raisonner, d'abord en logique combinatoire puis en séquentiel, avant de passer au GRAFCET et au langage Ladder sur automate.",
+    objectifs: ["Câbler des fonctions logiques sur maquettes à logigrammes (ET, OU, NON, mémoires)", "Maîtriser la logique combinatoire puis séquentielle", "Concevoir des GRAFCET séquentiels", "Programmer en Ladder sur automate d'initiation et valider sur maquette"],
+    technologies: ["Logigrammes", "Portes logiques", "GRAFCET", "Ladder", "Automate didactique", "Maquettes"],
+    resultats: "Socle de toutes mes compétences en automatisme. Ce module a confirmé mon orientation et m'a fourni les bases pour les projets suivants. En alternance, j'ai ensuite retrouvé cette logique sur des installations réelles, à travers plusieurs générations de logiciels Siemens.",
     competence: "Concevoir — Niveau 1",
     competenceDetail: "Mener une conception partielle intégrant une démarche projet",
+    generations: [
+      { label: "Step 5", year: "1979 — Siemens", desc: "Logiciel historique, encore en service sur quelques installations anciennes du département. La logique s'y lit en liste d'instructions ou en Ladder." },
+      { src: "/projets/siemens-step7-ctemp.jpg", label: "Step 7 — SIMATIC Manager", year: "Génération intermédiaire", desc: "Environnement des automates S7-300/400, très répandu en usine. Ici un bloc de contrôle de température en Ladder (projet sonde PT100, ligne 21)." },
+      { src: "/projets/siemens-tia-portal.jpg", label: "TIA Portal", year: "Génération actuelle", desc: "La plateforme Siemens la plus récente. Ici le séquenceur de la procédure CHAFAB de la ligne 340, consulté sur écran SIMATIC HMI." },
+    ],
   },
   {
     tag: "Projet académique — 2ème année",
@@ -886,7 +933,7 @@ const projects: Project[] = [
     competence: "Intégrer — Niveau 2",
     competenceDetail: "Interagir avec les différents acteurs, lors de l'installation et de la mise en service d'un système, dans une démarche qualité",
     lecons: "Ne pas chercher trop compliqué : aller à l'essentiel, valider une chose simple, puis augmenter la complexité étape par étape.",
-    screenshots: ["/projets/retourneur-photo.jpg"],
+    screenshots: ["/projets/retourneur-photo.jpg", "/projets/retourneur-pl7-structure.jpg", "/projets/retourneur-pl7-ladder.jpg"],
     videos: [{ src: "/projets/retourneur-demo.mp4", label: "Démonstration du système d'économie d'énergie sur le retourneur" }],
   },
   {
@@ -978,13 +1025,42 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 10 }}>Résultats &amp; apports</p>
             <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.7 }}>{project.resultats}</p>
           </div>
+          {project.generations && (
+            <div style={{ marginTop: 16, background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 22px" }}>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 10 }}>Trois générations de logiciels Siemens</p>
+              <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6, marginBottom: 14 }}>
+                De la maquette d'initiation aux installations réelles : en alternance chez Ampère Electricity, plusieurs générations de logiciels Siemens cohabitent sur les lignes. Les pratiquer toutes en dépannage oblige à s'adapter à chaque environnement.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+                {project.generations.map((g) => (
+                  <div key={g.label} style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", background: "var(--bg2)" }}>
+                    {g.src ? (
+                      <a href={g.src} target="_blank" rel="noopener noreferrer" style={{ display: "block", aspectRatio: "4/3", overflow: "hidden", background: "#0d1014" }}>
+                        <img src={g.src} alt={g.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      </a>
+                    ) : (
+                      <div style={{ aspectRatio: "4/3", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "#0d1520" }}>
+                        <span className="display" style={{ fontSize: 38, color: "#5080b0", letterSpacing: "0.06em" }}>STEP 5</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>Siemens · 1979</span>
+                      </div>
+                    )}
+                    <div style={{ padding: "10px 12px 12px" }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{g.label}</div>
+                      <div style={{ fontSize: 10.5, fontWeight: 600, color: project.color, marginBottom: 5 }}>{g.year}</div>
+                      <p style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.55 }}>{g.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {project.screenshots && project.screenshots.length > 0 && (
             <div style={{ marginTop: 16 }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: project.color, marginBottom: 12 }}>Captures</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
                 {project.screenshots.map((src, i) => (
-                  <a key={i} href={src} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)" }}>
-                    <img src={src} alt={`${project.title} — capture ${i + 1}`} style={{ width: "100%", display: "block" }} />
+                  <a key={i} href={src} target="_blank" rel="noopener noreferrer" title="Ouvrir l'image en taille réelle" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)", aspectRatio: "4/3", background: "#0d1014" }}>
+                    <img src={src} alt={`${project.title} — capture ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </a>
                 ))}
               </div>
@@ -1457,8 +1533,8 @@ function Alternance() {
               {installModal.photos && installModal.photos.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
                   {installModal.photos.map((src, i) => (
-                    <a key={i} href={src} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)" }}>
-                      <img src={src} alt={`${installModal.title} — photo ${i + 1}`} style={{ width: "100%", display: "block" }} />
+                    <a key={i} href={src} target="_blank" rel="noopener noreferrer" title="Ouvrir l'image en taille réelle" style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)", aspectRatio: "4/3", background: "#0d1014" }}>
+                      <img src={src} alt={`${installModal.title} — photo ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </a>
                   ))}
                 </div>
@@ -1484,16 +1560,221 @@ function Alternance() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SOUND DESIGN LOISIRS — sons 100% synthétisés en Web Audio
+   (aucun fichier audio : rien à charger, pas de droits)
+═══════════════════════════════════════════════════════════ */
+let audioCtx: AudioContext | null = null;
+function getAudioCtx(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AC) return null;
+  if (!audioCtx) audioCtx = new AC();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+/* F1 — montée en régime puis décélération (2 oscillateurs désaccordés) */
+function playF1() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.0001, t);
+  master.gain.exponentialRampToValueAtTime(0.15, t + 0.1);
+  master.gain.setValueAtTime(0.15, t + 1.55);
+  master.gain.exponentialRampToValueAtTime(0.0001, t + 2.25);
+  master.connect(ctx.destination);
+  const lp = ctx.createBiquadFilter(); lp.type = "lowpass";
+  lp.frequency.setValueAtTime(500, t);
+  lp.frequency.exponentialRampToValueAtTime(4200, t + 1.55);
+  lp.frequency.exponentialRampToValueAtTime(700, t + 2.25);
+  lp.connect(master);
+  ([[55, 660, "sawtooth", 0.7], [110.7, 1318, "square", 0.32]] as [number, number, OscillatorType, number][]).forEach(([f0, f1, type, vol]) => {
+    const o = ctx.createOscillator(); o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f1, t + 1.55);
+    o.frequency.exponentialRampToValueAtTime(f1 * 0.3, t + 2.25);
+    const g = ctx.createGain(); g.gain.value = vol;
+    o.connect(g); g.connect(lp);
+    o.start(t); o.stop(t + 2.3);
+  });
+}
+
+/* Musculation — la barre qui claque au sol : impact sourd + résonances métalliques, double rebond */
+function playMuscu() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime;
+  const clank = (t: number, vol: number, mult: number) => {
+    const dur = 0.35;
+    const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2600 * mult; bp.Q.value = 0.9;
+    const g = ctx.createGain(); g.gain.value = vol;
+    src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    src.start(t);
+    [2730, 4170, 6310].forEach((f, i) => {
+      const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f * mult;
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(vol * 0.25 / (i + 1), t);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + 0.45 + i * 0.12);
+      o.connect(og); og.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.8);
+    });
+    const thud = ctx.createOscillator(); thud.type = "sine";
+    thud.frequency.setValueAtTime(95 * mult, t);
+    thud.frequency.exponentialRampToValueAtTime(38, t + 0.18);
+    const tg = ctx.createGain();
+    tg.gain.setValueAtTime(vol * 1.5, t);
+    tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    thud.connect(tg); tg.connect(ctx.destination);
+    thud.start(t); thud.stop(t + 0.35);
+  };
+  clank(t0, 0.28, 1);
+  clank(t0 + 0.22, 0.15, 1.18);
+}
+
+/* Jeux vidéo — jingle « secret découvert » de Zelda, son 8-bit (onde carrée) */
+function playZelda() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.02;
+  const notes = [784, 739.99, 622.25, 440, 415.3, 659.25, 830.61, 1046.5];
+  const step = 0.135;
+  notes.forEach((f, i) => {
+    const t = t0 + i * step;
+    const last = i === notes.length - 1;
+    const o = ctx.createOscillator(); o.type = "square"; o.frequency.value = f;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.08, t + 0.012);
+    if (last) {
+      g.gain.setValueAtTime(0.08, t + 0.4);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.0);
+    } else {
+      g.gain.exponentialRampToValueAtTime(0.0001, t + step + 0.02);
+    }
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + (last ? 1.05 : step + 0.04));
+  });
+  const tl = t0 + (notes.length - 1) * step;
+  const o2 = ctx.createOscillator(); o2.type = "triangle"; o2.frequency.value = 523.25;
+  const g2 = ctx.createGain();
+  g2.gain.setValueAtTime(0.0001, tl);
+  g2.gain.exponentialRampToValueAtTime(0.055, tl + 0.02);
+  g2.gain.exponentialRampToValueAtTime(0.0001, tl + 0.9);
+  o2.connect(g2); g2.connect(ctx.destination);
+  o2.start(tl); o2.stop(tl + 1);
+}
+
+/* Lecture & Mangas — rasengan : souffle tourbillonnant qui accélère + nappe d'énergie montante */
+function playRasengan() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const dur = 1.8;
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 2.2;
+  bp.frequency.setValueAtTime(350, t);
+  bp.frequency.exponentialRampToValueAtTime(2600, t + dur);
+  const lfo = ctx.createOscillator();
+  lfo.frequency.setValueAtTime(7, t);
+  lfo.frequency.linearRampToValueAtTime(19, t + dur);
+  const lfoG = ctx.createGain(); lfoG.gain.value = 260;
+  lfo.connect(lfoG); lfoG.connect(bp.frequency);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.19, t + 0.45);
+  g.gain.setValueAtTime(0.19, t + dur - 0.4);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+  const o = ctx.createOscillator(); o.type = "sine";
+  o.frequency.setValueAtTime(150, t);
+  o.frequency.exponentialRampToValueAtTime(620, t + dur);
+  const og = ctx.createGain();
+  og.gain.setValueAtTime(0.0001, t);
+  og.gain.exponentialRampToValueAtTime(0.055, t + 0.4);
+  og.gain.setValueAtTime(0.055, t + dur - 0.5);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(og); og.connect(ctx.destination);
+  lfo.start(t); src.start(t); o.start(t);
+  lfo.stop(t + dur); o.stop(t + dur);
+}
+
+/* ═══════════════════════════════════════════════════════════
    LOISIRS
 ═══════════════════════════════════════════════════════════ */
-const loisirs = [
-  { icon: "🏎️", title: "Formule 1", desc: "Je suis de près la F1 depuis plusieurs années, notamment les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030" },
-  { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2" },
-  { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0" },
-  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020" },
+type LoisirFx = "f1" | "muscu" | "zelda" | "rasengan";
+
+const FX_SOUNDS: Record<LoisirFx, { play: () => void; duration: number }> = {
+  f1:       { play: playF1,       duration: 2300 },
+  muscu:    { play: playMuscu,    duration: 950 },
+  zelda:    { play: playZelda,    duration: 2100 },
+  rasengan: { play: playRasengan, duration: 1900 },
+};
+
+const loisirs: { icon: string; title: string; desc: string; tags: string[]; color: string; fx: LoisirFx; sonHint: string }[] = [
+  { icon: "🏎️", title: "Formule 1", desc: "Je suis de près la F1 depuis plusieurs années, notamment les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030", fx: "f1", sonHint: "Montée en régime" },
+  { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2", fx: "muscu", sonHint: "Fin de série" },
+  { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0", fx: "zelda", sonHint: "Un secret bien connu" },
+  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "rasengan", sonHint: "Tourbillon de chakra" },
 ];
 
+function F1Fx() {
+  return (
+    <div className="fx-overlay" style={{ background: "transparent", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxOverlayFade 2.3s ease forwards" }}>
+      {[16, 32, 50, 67, 83].map((top, i) => (
+        <span key={i} className="fx-f1-line" style={{ top: `${top}%`, animationDelay: `${i * 0.08}s` }} />
+      ))}
+    </div>
+  );
+}
+
+function MuscuFx() {
+  return (
+    <div className="fx-overlay" style={{ background: "transparent", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxOverlayFade 0.95s ease forwards" }}>
+      <span style={{ fontSize: 58, animation: "fxDrop 0.9s cubic-bezier(.34,1.4,.4,1) both" }}>🏋️</span>
+    </div>
+  );
+}
+
+function TriforceFx() {
+  return (
+    <div className="fx-overlay" style={{ animation: "fxOverlayFade 2.1s ease forwards" }}>
+      <div style={{ position: "relative", width: 88, height: 76, animation: "fxTriGlow 2.1s ease both" }}>
+        <div className="fx-tri" style={{ left: 22, top: 0, animation: "fxTriIn1 0.85s cubic-bezier(.22,1,.36,1) both" }} />
+        <div className="fx-tri" style={{ left: 0, top: 38, animation: "fxTriIn2 0.85s cubic-bezier(.22,1,.36,1) both" }} />
+        <div className="fx-tri" style={{ left: 44, top: 38, animation: "fxTriIn3 0.85s cubic-bezier(.22,1,.36,1) both" }} />
+      </div>
+    </div>
+  );
+}
+
+function RasenganFx() {
+  return (
+    <div className="fx-overlay" style={{ animation: "fxOverlayFade 1.9s ease forwards" }}>
+      <div style={{ position: "relative", width: 110, height: 110, animation: "fxOrbPulse 1.9s cubic-bezier(.22,1,.36,1) both" }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle at 38% 35%, #e8f4ff 0%, #8cc6ff 30%, #2d7dd2 62%, rgba(20,60,140,0.4) 82%, transparent 100%)", boxShadow: "0 0 50px rgba(74,150,240,0.9), 0 0 110px rgba(45,125,210,0.5)" }} />
+        <div style={{ position: "absolute", inset: 6, borderRadius: "50%", background: "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.85) 18deg, transparent 60deg, transparent 120deg, rgba(255,255,255,0.6) 150deg, transparent 200deg, transparent 250deg, rgba(255,255,255,0.7) 285deg, transparent 330deg)", animation: "fxOrbSpin 1.9s cubic-bezier(.3,.2,.2,1) both", opacity: 0.8, mixBlendMode: "screen" }} />
+        <div style={{ position: "absolute", inset: 32, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.95), rgba(180,220,255,0.3) 70%, transparent)" }} />
+      </div>
+    </div>
+  );
+}
+
 function Loisirs() {
+  const [activeFx, setActiveFx] = useState<LoisirFx | null>(null);
+  const fxTimer = useRef<number | null>(null);
+
+  function trigger(fx: LoisirFx) {
+    try { FX_SOUNDS[fx].play(); } catch { /* audio indisponible : l'animation joue quand même */ }
+    setActiveFx(null);
+    requestAnimationFrame(() => setActiveFx(fx));
+    if (fxTimer.current) window.clearTimeout(fxTimer.current);
+    fxTimer.current = window.setTimeout(() => setActiveFx(null), FX_SOUNDS[fx].duration);
+  }
+
   return (
     <section id="loisirs" className="section">
       <div className="glow-circle" style={{ width: 500, height: 500, background: "rgba(45,125,210,0.04)", top: -100, left: -100 }} />
@@ -1505,16 +1786,33 @@ function Loisirs() {
         <p className="reveal reveal-delay-2" style={{ color: "var(--muted)", fontSize: 16, marginTop: 16, maxWidth: 620, lineHeight: 1.7 }}>
           Mes centres d'intérêt reflètent les mêmes valeurs que mon parcours professionnel : rigueur, curiosité technique, dépassement de soi et goût de l'innovation.
         </p>
+        <p className="reveal reveal-delay-3" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--blue)", fontSize: 13, marginTop: 14 }}>
+          <Volume2 size={15} /> Chaque carte a son ambiance sonore : cliquez pour écouter.
+        </p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
         {loisirs.map((l, i) => (
-          <div key={l.title} className={`loisir-card reveal reveal-delay-${(i % 4) + 1}`} style={{ borderTop: `2px solid ${l.color}60` }}>
+          <div
+            key={l.title}
+            className={`loisir-card reveal reveal-delay-${(i % 4) + 1}${activeFx === "muscu" && l.fx === "muscu" ? " fx-shake" : ""}`}
+            style={{ borderTop: `2px solid ${l.color}60` }}
+            onClick={() => trigger(l.fx)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && trigger(l.fx)}
+            aria-label={`${l.title} — jouer l'ambiance sonore`}
+          >
             <span className="loisir-icon">{l.icon}</span>
+            <div className="loisir-sound-badge"><Volume2 size={13} /> {l.sonHint}</div>
             <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>{l.title}</h3>
             <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{l.desc}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {l.tags.map((t) => <span key={t} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${l.color}40`, fontSize: 11, color: l.color, background: `${l.color}10` }}>{t}</span>)}
             </div>
+            {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
+            {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
+            {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
+            {activeFx === l.fx && l.fx === "rasengan" && <RasenganFx />}
           </div>
         ))}
       </div>
