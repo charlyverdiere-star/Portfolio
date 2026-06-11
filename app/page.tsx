@@ -27,8 +27,9 @@ const globalStyles = `
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; background: var(--bg); }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+  html, body { background: var(--bg); min-height: 100%; }
+  html { scroll-behavior: smooth; }
+  body { color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6; overflow-x: hidden; min-height: 100vh; min-height: 100lvh; }
 
   body::before {
     content: ''; position: fixed; inset: 0;
@@ -71,25 +72,36 @@ const globalStyles = `
   .btn-ghost:hover { border-color: rgba(45,125,210,0.5); color: var(--blue); transform: translateY(-2px); }
 
   /* HERO */
-  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(45,125,210,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(45,125,210,0.04) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%); pointer-events: none; }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(45,125,210,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(45,125,210,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    /* desktop : ellipse resserrée en haut */
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+    pointer-events: none;
+  }
+  @media (max-width: 600px) {
+    /* mobile : ellipse beaucoup plus large pour couvrir l'ensemble du hero */
+    .hero-grid { -webkit-mask-image: radial-gradient(ellipse 140% 90% at 50% 30%, black 60%, transparent 100%); mask-image: radial-gradient(ellipse 140% 90% at 50% 30%, black 60%, transparent 100%); }
+  }
   @keyframes scan { from { transform: translateY(0); } to { transform: translateY(100vh); } }
   .scan-line { position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(45,125,210,0.3), transparent); animation: scan 6s linear infinite; pointer-events: none; }
 
-  /* ── NAVBAR ── */
-  /* env(safe-area-inset-top) : la navbar couvre la zone status bar iOS (viewport-fit=cover) */
+  /* ── NAVBAR ──
+     iOS Safari (viewport-fit=cover) : la navbar absorbe la zone status bar via env(safe-area-inset-top).
+     Background totalement opaque dès qu'on scrolle (fini le contenu visible derrière sur Safari/Opera GX). */
   .navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 5%; height: 68px;
+    padding: 0 5%;
     padding-top: env(safe-area-inset-top, 0px);
     height: calc(68px + env(safe-area-inset-top, 0px));
     transition: background 0.4s, border-color 0.4s;
     border-bottom: 1px solid transparent;
   }
   .navbar.scrolled {
-    background: rgba(10,12,14,0.92);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: #0e1012;
     border-color: rgba(255,255,255,0.1);
   }
   .nav-logo-btn {
@@ -184,52 +196,35 @@ const globalStyles = `
   .loisir-sound-badge { position: absolute; top: 18px; right: 20px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); opacity: 0.55; transition: opacity 0.2s, color 0.2s; }
   .loisir-card:hover .loisir-sound-badge { opacity: 1; color: var(--blue); }
 
-  /* ── FX LOISIRS (déclenchés au clic, avec le son) ── */
-  .fx-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(10,12,14,0.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); z-index: 5; border-radius: inherit; }
-  @keyframes fxOverlayFade { 0% { opacity: 0; } 10% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+  /* ── FX LOISIRS (déclenchés au clic, avec le son) ──
+     Refonte v3 : aucun backdrop-filter ni mix-blend-mode (instables sur Opera GX / Safari).
+     Le contenu de la carte reste toujours visible. Les effets se superposent en pointer-events:none. */
+  .fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; border-radius: inherit; overflow: hidden; }
 
-  /* Formule 1 — lignes de vitesse */
+  /* Formule 1 — lignes de vitesse rouges qui balayent la carte */
   @keyframes fxDash { from { transform: translateX(-140%); } to { transform: translateX(560%); } }
-  .fx-f1-line { position: absolute; left: 0; height: 2px; width: 30%; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(232,48,48,0.9), transparent); animation: fxDash 0.45s linear infinite; }
+  .fx-f1-line { position: absolute; left: 0; height: 2px; width: 30%; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(232,48,48,0.95), transparent); animation: fxDash 0.45s linear infinite; box-shadow: 0 0 12px rgba(232,48,48,0.8); }
+  @keyframes fxF1Fade { 0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
 
   /* Musculation — pump : la carte gonfle/pulse + compteur de reps qui s'incrémente */
-  @keyframes fxPump { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 18% { transform: scale(1.03); box-shadow: 0 0 0 6px rgba(45,125,210,0.12), 0 14px 36px rgba(45,125,210,0.25); } 36% { transform: scale(0.985); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 54% { transform: scale(1.025); box-shadow: 0 0 0 4px rgba(45,125,210,0.1), 0 12px 30px rgba(45,125,210,0.22); } 72% { transform: scale(0.99); } 90% { transform: scale(1.012); } }
+  @keyframes fxPump { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 18% { transform: scale(1.03); box-shadow: 0 0 0 6px rgba(45,125,210,0.18), 0 14px 36px rgba(45,125,210,0.3); } 36% { transform: scale(0.985); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 54% { transform: scale(1.025); box-shadow: 0 0 0 4px rgba(45,125,210,0.15), 0 12px 30px rgba(45,125,210,0.25); } 72% { transform: scale(0.99); } 90% { transform: scale(1.012); } }
   .loisir-card.fx-pump { animation: fxPump 1.45s cubic-bezier(.45,.05,.55,.95); }
   @keyframes fxRep { 0% { transform: translateY(34px) scale(0.4); opacity: 0; } 30% { transform: translateY(0) scale(1.15); opacity: 1; } 75% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-22px) scale(1); opacity: 0; } }
-  @keyframes fxFlex { 0% { transform: translateY(20px) scale(0.6); opacity: 0; } 30% { transform: translateY(0) scale(1.1) rotate(-3deg); opacity: 1; } 60% { transform: scale(1) rotate(0); } 100% { transform: scale(1.05); opacity: 0; } }
+  @keyframes fxFlex { 0% { transform: translate(-50%, calc(-50% + 20px)) scale(0.6); opacity: 0; } 30% { transform: translate(-50%, -50%) scale(1.1) rotate(-3deg); opacity: 1; } 60% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0; } }
 
   /* Zelda — triforce qui s'assemble */
+  @keyframes fxZeldaFade { 0% { opacity: 0; } 8% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
   @keyframes fxTriIn1 { from { transform: translate(-80px, -70px) rotate(-160deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
   @keyframes fxTriIn2 { from { transform: translate(80px, -70px) rotate(160deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
   @keyframes fxTriIn3 { from { transform: translate(0, 85px) rotate(200deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
-  @keyframes fxTriGlow { 0%, 55% { filter: drop-shadow(0 0 5px rgba(255,216,96,0.5)); } 78% { filter: drop-shadow(0 0 22px rgba(255,216,96,1)); } 100% { filter: drop-shadow(0 0 10px rgba(255,216,96,0.7)); } }
-  .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; }
+  .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; filter: drop-shadow(0 0 8px rgba(255,216,96,0.85)); }
 
-  /* Aura SSJ2 — flammes jaunes qui jaillissent autour de la carte + éclairs */
-  @keyframes fxAuraFlicker {
-    0%   { opacity: 0; transform: scale(0.7) translateY(20px); }
-    18%  { opacity: 0.85; transform: scale(1.02) translateY(0); }
-    35%  { opacity: 0.55; transform: scale(0.97); }
-    52%  { opacity: 0.95; transform: scale(1.04); }
-    70%  { opacity: 0.65; transform: scale(0.99); }
-    85%  { opacity: 0.8;  transform: scale(1.02); }
-    100% { opacity: 0;    transform: scale(1.1) translateY(-15px); }
-  }
-  @keyframes fxAuraTongue {
-    0%   { transform: translateY(0) scaleY(0.4) scaleX(1); opacity: 0; }
-    20%  { transform: translateY(-30px) scaleY(1.15) scaleX(0.92); opacity: 1; }
-    55%  { transform: translateY(-58px) scaleY(0.85) scaleX(1.1); opacity: 0.95; }
-    100% { transform: translateY(-110px) scaleY(0.2) scaleX(0.5); opacity: 0; }
-  }
-  @keyframes fxBoltFlash {
-    0%, 100% { opacity: 0; }
-    8%, 14%  { opacity: 0.95; }
-    22%      { opacity: 0; }
-    40%, 46% { opacity: 0.95; }
-    54%      { opacity: 0; }
-    70%, 76% { opacity: 0.95; }
-  }
-  .loisir-card.fx-ssj2 { box-shadow: 0 0 0 2px rgba(255,216,80,0.65), 0 0 60px rgba(255,200,40,0.55), 0 0 100px rgba(255,170,40,0.35); transition: box-shadow 0.2s; }
+  /* Aura SSJ2 — flammes jaunes autour de la carte + éclairs blancs/bleus */
+  @keyframes fxSsj2Halo { 0% { opacity: 0; box-shadow: 0 0 0 0 rgba(255,216,80,0); } 15% { opacity: 1; box-shadow: 0 0 0 3px rgba(255,216,80,0.7), 0 0 50px 8px rgba(255,200,40,0.55), 0 0 90px 14px rgba(255,170,40,0.35); } 35% { box-shadow: 0 0 0 2px rgba(255,216,80,0.55), 0 0 35px 5px rgba(255,200,40,0.4); } 55% { box-shadow: 0 0 0 4px rgba(255,216,80,0.8), 0 0 60px 12px rgba(255,200,40,0.65), 0 0 110px 20px rgba(255,170,40,0.45); } 80% { box-shadow: 0 0 0 2px rgba(255,216,80,0.5), 0 0 40px 6px rgba(255,200,40,0.35); } 100% { opacity: 0; box-shadow: 0 0 0 0 rgba(255,216,80,0); } }
+  .loisir-card.fx-ssj2 { animation: fxSsj2Halo 2.6s cubic-bezier(.5,0,.5,1); }
+  @keyframes fxAuraTongue { 0% { transform: translateY(0) scaleY(0.4); opacity: 0; } 20% { transform: translateY(-30px) scaleY(1.15); opacity: 1; } 55% { transform: translateY(-58px) scaleY(0.85); opacity: 0.95; } 100% { transform: translateY(-110px) scaleY(0.2); opacity: 0; } }
+  @keyframes fxBolt { 0%, 100% { opacity: 0; } 10%, 18% { opacity: 1; } 30% { opacity: 0; } 50%, 56% { opacity: 1; } 65% { opacity: 0; } 78%, 84% { opacity: 1; } 92% { opacity: 0; } }
+  @keyframes fxKanji { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } 70% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
 
   /* CONTACT */
   .contact-link { display: flex; align-items: center; gap: 20px; padding: 24px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; color: var(--text); transition: border-color 0.3s, transform 0.3s, background 0.3s; }
@@ -255,8 +250,11 @@ const globalStyles = `
       padding-top: calc(90px + env(safe-area-inset-top, 0px)) !important;
       padding-bottom: 80px !important;
       justify-content: flex-start !important;
+      background: var(--bg);
     }
     #accueil > div[style] { padding-top: 0; }
+    /* Glow circles repositionnés pour ne pas dépasser sur les côtés */
+    #accueil .glow-circle { display: none; }
   }
 
   /* Email button mobile fix */
@@ -749,32 +747,32 @@ function About() {
 /* ═══════════════════════════════════════════════════════════
    SKILLS  — niveau nommé au lieu de % arbitraires
 ═══════════════════════════════════════════════════════════ */
-type SkillLevel = "Notions" | "Pratique" | "Maîtrise" | "Expert";
+type SkillLevel = "Découverte" | "Application" | "Autonomie" | "Référent";
 const LEVEL_MAP: Record<SkillLevel, { pct: number; color: string }> = {
-  "Notions":  { pct: 25,  color: "#6080a0" },
-  "Pratique": { pct: 55,  color: "#2d7dd2" },
-  "Maîtrise": { pct: 80,  color: "#2d7dd2" },
-  "Expert":   { pct: 100, color: "#40c0f0" },
+  "Découverte":  { pct: 25,  color: "#6080a0" },
+  "Application": { pct: 55,  color: "#2d7dd2" },
+  "Autonomie":   { pct: 80,  color: "#2d7dd2" },
+  "Référent":    { pct: 100, color: "#40c0f0" },
 };
 
 const technicalSkills: { icon: React.ReactNode; name: string; desc: string; level: SkillLevel }[] = [
-  { icon: <Zap size={22} />,      name: "Automatisme",              desc: "GRAFCET, Ladder, API Siemens & TSX Premium, PL7 Pro",     level: "Pratique" },
-  { icon: <Network size={22} />,  name: "Réseaux industriels",      desc: "Communication automate/IHM, diagnostic réseau industriel", level: "Notions" },
-  { icon: <Code2 size={22} />,    name: "Programmation",            desc: "Python, C, Arduino, Unity Pro, PL7 Pro",                   level: "Notions" },
-  { icon: <Activity size={22} />, name: "Électronique",             desc: "Montages analogiques, numériques, capteurs industriels",   level: "Notions" },
-  { icon: <Settings size={22} />, name: "Supervision / IHM",       desc: "WIN CC, création et modification d'interfaces opérateur",  level: "Pratique" },
-  { icon: <Wrench size={22} />,   name: "Maintenance industrielle", desc: "Dépannage méthodique, presses, découpes laser, relais",    level: "Pratique" },
-  { icon: <Cpu size={22} />,      name: "Électricité industrielle", desc: "Câblage, cartes analogiques, relais, plans électriques",   level: "Pratique" },
-  { icon: <BookOpen size={22} />, name: "Anglais — TOEIC 840",     desc: "Lecture de documentation technique, communication pro",     level: "Maîtrise" },
+  { icon: <Zap size={22} />,      name: "Automatisme",              desc: "GRAFCET, Ladder, API Siemens & TSX Premium, PL7 Pro",     level: "Application" },
+  { icon: <Network size={22} />,  name: "Réseaux industriels",      desc: "Communication automate/IHM, diagnostic réseau industriel", level: "Découverte" },
+  { icon: <Code2 size={22} />,    name: "Programmation",            desc: "Python, C, Arduino, Unity Pro, PL7 Pro",                   level: "Découverte" },
+  { icon: <Activity size={22} />, name: "Électronique",             desc: "Montages analogiques, numériques, capteurs industriels",   level: "Découverte" },
+  { icon: <Settings size={22} />, name: "Supervision / IHM",       desc: "WIN CC, création et modification d'interfaces opérateur",  level: "Application" },
+  { icon: <Wrench size={22} />,   name: "Maintenance industrielle", desc: "Dépannage méthodique, presses, découpes laser, relais",    level: "Application" },
+  { icon: <Cpu size={22} />,      name: "Électricité industrielle", desc: "Câblage, cartes analogiques, relais, plans électriques",   level: "Application" },
+  { icon: <BookOpen size={22} />, name: "Anglais — TOEIC 840",     desc: "Lecture de documentation technique, communication pro",     level: "Autonomie" },
 ];
 
 const softSkills: { name: string; level: SkillLevel; desc: string }[] = [
-  { name: "Travail en équipe",        level: "Pratique", desc: "Projets académiques et missions entreprise" },
-  { name: "Résolution de problèmes",  level: "Pratique", desc: "Diagnostics terrain, approche méthodique" },
-  { name: "Rigueur & méthode",        level: "Pratique", desc: "Exigence industrielle au quotidien" },
-  { name: "Autonomie",                level: "Pratique", desc: "Missions en production sans encadrement" },
-  { name: "Communication technique",  level: "Notions", desc: "Rédaction de rapports, échanges fabricants" },
-  { name: "Capacité d'adaptation",    level: "Pratique", desc: "Environnements variés, nouveaux outils" },
+  { name: "Travail en équipe",        level: "Application", desc: "Projets académiques et missions entreprise" },
+  { name: "Résolution de problèmes",  level: "Application", desc: "Diagnostics terrain, approche méthodique" },
+  { name: "Rigueur & méthode",        level: "Application", desc: "Exigence industrielle au quotidien" },
+  { name: "Autonomie",                level: "Application", desc: "Missions en production sans encadrement" },
+  { name: "Communication technique",  level: "Découverte",  desc: "Rédaction de rapports, échanges fabricants" },
+  { name: "Capacité d'adaptation",    level: "Application", desc: "Environnements variés, nouveaux outils" },
 ];
 
 function LevelBadge({ level }: { level: SkillLevel }) {
@@ -1222,7 +1220,6 @@ const installations = [
       subtitle: "Trois générations sur un même métier",
       desc: "Au département emboutissage, plusieurs générations de logiciels Siemens cohabitent sur les lignes. À chaque intervention, je peux me retrouver face à Step 5 sur un afficheur d'origine, Step 7 / SIMATIC Manager sur les S7-300/400, ou TIA Portal sur les installations récentes. La logique métier reste la même — ici les conditions d'embrayage d'une presse, comparées d'un environnement à l'autre. Savoir naviguer entre ces trois mondes fait partie du quotidien.",
       gallery: ihmGenerations,
-      photos: ["/projets/siemens-tia-chafab.jpg", "/projets/siemens-step7-cpu.jpg"],
     },
   },
 ];
@@ -1567,7 +1564,7 @@ const loisirs: { icon: string; title: string; desc: string; tags: string[]; colo
 
 function F1Fx() {
   return (
-    <div className="fx-overlay" style={{ background: "transparent", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxOverlayFade 2.3s ease forwards" }}>
+    <div className="fx-layer" style={{ animation: "fxF1Fade 2.3s ease forwards" }}>
       {[16, 32, 50, 67, 83].map((top, i) => (
         <span key={i} className="fx-f1-line" style={{ top: `${top}%`, animationDelay: `${i * 0.08}s` }} />
       ))}
@@ -1578,27 +1575,44 @@ function F1Fx() {
 function MuscuFx() {
   /* Compteur de reps qui apparaît à chaque rep audio (0.42s d'écart, voir playMuscu) */
   return (
-    <div className="fx-overlay" style={{ background: "rgba(10,12,14,0.4)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)", animation: "fxOverlayFade 2.4s ease forwards", flexDirection: "column", gap: 4 }}>
-      <div style={{ position: "relative", width: 110, height: 110 }}>
-        {[1, 2, 3, 4].map((n, i) => (
-          <div key={n} style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Bebas Neue', sans-serif", fontSize: 96, color: "#2d7dd2", letterSpacing: "0.04em", textShadow: "0 0 24px rgba(45,125,210,0.65)", animation: `fxRep 0.42s cubic-bezier(.34,1.6,.5,1) both`, animationDelay: `${i * 0.42}s` }}>
-            {n}
-          </div>
-        ))}
-        {/* Mention « FLEX! » sur la dernière rep */}
-        <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: "#fff", letterSpacing: "0.12em", textShadow: "0 0 18px rgba(45,125,210,0.9), 0 4px 10px rgba(0,0,0,0.7)", animation: "fxFlex 0.9s cubic-bezier(.22,1,.36,1) both", animationDelay: "1.55s", whiteSpace: "nowrap" }}>
-          FLEX !
+    <div className="fx-layer" style={{ animation: "fxF1Fade 2.4s ease forwards" }}>
+      {/* Compteur centré */}
+      {[1, 2, 3, 4].map((n, i) => (
+        <div key={n} style={{
+          position: "absolute", left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: 110, lineHeight: 1, color: "#2d7dd2",
+          letterSpacing: "0.04em",
+          textShadow: "0 0 24px rgba(45,125,210,0.85), 0 0 60px rgba(45,125,210,0.5), 0 4px 12px rgba(0,0,0,0.85)",
+          animation: `fxRep 0.42s cubic-bezier(.34,1.6,.5,1) both`,
+          animationDelay: `${i * 0.42}s`,
+        }}>
+          {n}
         </div>
+      ))}
+      {/* FLEX! sur la dernière rep */}
+      <div style={{
+        position: "absolute", left: "50%", top: "50%",
+        transform: "translate(-50%, -50%)",
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: 44, color: "#fff", letterSpacing: "0.14em",
+        textShadow: "0 0 22px rgba(45,125,210,1), 0 0 50px rgba(45,125,210,0.7), 0 4px 14px rgba(0,0,0,0.9)",
+        animation: "fxFlex 0.9s cubic-bezier(.22,1,.36,1) both",
+        animationDelay: "1.55s",
+        whiteSpace: "nowrap",
+        opacity: 0,
+      }}>
+        FLEX !
       </div>
-      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "0.3em", color: "var(--accent)", marginTop: 10 }}>SÉRIE COMPLÈTE</span>
     </div>
   );
 }
 
 function TriforceFx() {
   return (
-    <div className="fx-overlay" style={{ animation: "fxOverlayFade 2.1s ease forwards" }}>
-      <div style={{ position: "relative", width: 88, height: 76, animation: "fxTriGlow 2.1s ease both" }}>
+    <div className="fx-layer" style={{ animation: "fxZeldaFade 2.1s ease forwards", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "relative", width: 88, height: 76 }}>
         <div className="fx-tri" style={{ left: 22, top: 0, animation: "fxTriIn1 0.85s cubic-bezier(.22,1,.36,1) both" }} />
         <div className="fx-tri" style={{ left: 0, top: 38, animation: "fxTriIn2 0.85s cubic-bezier(.22,1,.36,1) both" }} />
         <div className="fx-tri" style={{ left: 44, top: 38, animation: "fxTriIn3 0.85s cubic-bezier(.22,1,.36,1) both" }} />
@@ -1608,52 +1622,52 @@ function TriforceFx() {
 }
 
 function SSJ2Fx() {
-  /* Aura SSJ2 : halo jaune autour de la carte + langues de flamme qui jaillissent
-     du sol vers le haut + éclairs bleus qui crépitent. Bordure dorée pulsante. */
+  /* Aura SSJ2 v2 : halo doré sur la carte (via fx-ssj2 box-shadow), langues de flammes
+     en bas, éclairs blancs/bleus en SVG simples, kanji 力 au centre.
+     PAS de mix-blend-mode, PAS de backdrop-filter, PAS de SVG filter (instables sur Opera GX / Safari). */
   const flames = [
-    { left: "5%",  delay: 0.05, scale: 1.0,  hue: "#ffe060" },
-    { left: "18%", delay: 0.2,  scale: 0.85, hue: "#ffc830" },
-    { left: "32%", delay: 0.0,  scale: 1.1,  hue: "#ffd848" },
-    { left: "46%", delay: 0.35, scale: 0.95, hue: "#ffb820" },
-    { left: "60%", delay: 0.1,  scale: 1.05, hue: "#ffd040" },
-    { left: "74%", delay: 0.3,  scale: 0.9,  hue: "#ffc638" },
-    { left: "88%", delay: 0.15, scale: 1.0,  hue: "#ffe068" },
+    { left: "6%",  delay: 0.05, scale: 1.0,  hue: "#ffe060" },
+    { left: "20%", delay: 0.25, scale: 0.85, hue: "#ffc830" },
+    { left: "35%", delay: 0.0,  scale: 1.05, hue: "#ffd848" },
+    { left: "50%", delay: 0.35, scale: 0.95, hue: "#ffb820" },
+    { left: "65%", delay: 0.1,  scale: 1.05, hue: "#ffd040" },
+    { left: "78%", delay: 0.3,  scale: 0.9,  hue: "#ffc638" },
+    { left: "90%", delay: 0.15, scale: 1.0,  hue: "#ffe068" },
   ];
   return (
-    <div className="fx-overlay" style={{ background: "radial-gradient(ellipse at center bottom, rgba(255,200,40,0.32) 0%, rgba(255,160,30,0.15) 40%, transparent 75%)", backdropFilter: "none", WebkitBackdropFilter: "none", animation: "fxAuraFlicker 2.6s cubic-bezier(.5,0,.5,1) forwards", overflow: "hidden" }}>
-      {/* Halo doré rayonnant */}
-      <div style={{ position: "absolute", inset: "-20%", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,220,80,0.45) 0%, rgba(255,170,40,0.25) 30%, transparent 65%)", filter: "blur(20px)", animation: "fxAuraFlicker 2.6s ease-in-out infinite" }} />
-
-      {/* Langues de flammes jaunes qui montent depuis le bas */}
+    <div className="fx-layer">
+      {/* Langues de flammes jaunes qui montent depuis le bas (boucle infinie pendant l'effet) */}
       {flames.map((f, i) => (
         <div key={i} style={{
           position: "absolute",
-          left: f.left, bottom: "-10%",
-          width: 36 * f.scale, height: 90 * f.scale,
-          background: `radial-gradient(ellipse at 50% 100%, ${f.hue} 0%, rgba(255,170,30,0.7) 45%, rgba(255,120,20,0) 90%)`,
-          filter: "blur(2px)",
+          left: f.left, bottom: "-15%",
+          width: 32 * f.scale, height: 80 * f.scale,
+          background: `radial-gradient(ellipse at 50% 100%, ${f.hue} 0%, rgba(255,170,30,0.7) 50%, rgba(255,120,20,0) 90%)`,
           borderRadius: "50% 50% 30% 30% / 70% 70% 30% 30%",
-          mixBlendMode: "screen",
-          animation: "fxAuraTongue 1.2s cubic-bezier(.55,.1,.7,.9) both infinite",
-          animationDelay: `${f.delay}s`,
+          animation: "fxAuraTongue 1.0s cubic-bezier(.55,.1,.7,.9) infinite, fxF1Fade 2.6s ease forwards",
+          animationDelay: `${f.delay}s, 0s`,
+          transform: "translateX(-50%)",
         }} />
       ))}
 
-      {/* Éclairs bleus SSJ2 — 3 traits zigzag qui crépitent */}
-      <svg viewBox="0 0 200 200" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", animation: "fxBoltFlash 2.6s linear forwards" }}>
-        <defs>
-          <filter id="boltGlow">
-            <feGaussianBlur stdDeviation="2.2" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <path d="M40,15 L48,65 L36,68 L60,140 L52,90 L66,86 L42,18" stroke="#9fdcff" strokeWidth="1.6" fill="none" filter="url(#boltGlow)" opacity="0.9" />
-        <path d="M160,28 L150,72 L168,78 L142,150 L158,110 L142,104 L162,30" stroke="#bdebff" strokeWidth="1.6" fill="none" filter="url(#boltGlow)" opacity="0.9" />
-        <path d="M100,5 L95,42 L108,46 L92,95 L104,60 L96,58 L102,8" stroke="#ffffff" strokeWidth="1.4" fill="none" filter="url(#boltGlow)" opacity="0.95" />
+      {/* Éclairs bleus/blancs en SVG simples (sans filter, sans glow SVG) */}
+      <svg viewBox="0 0 200 200" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+        <g style={{ animation: "fxBolt 2.6s linear forwards" }}>
+          <path d="M30,10 L42,60 L28,64 L52,135 L44,88 L60,82 L34,12" stroke="#9fdcff" strokeWidth="2.2" fill="none" />
+          <path d="M170,22 L156,70 L172,76 L142,150 L158,108 L142,102 L164,24" stroke="#bdebff" strokeWidth="2.2" fill="none" />
+          <path d="M100,5 L92,40 L108,46 L88,98 L102,58 L92,54 L102,7" stroke="#ffffff" strokeWidth="2" fill="none" />
+        </g>
       </svg>
 
-      {/* Symbole kanji énergie au centre, en surbrillance */}
-      <div style={{ position: "relative", zIndex: 2, fontFamily: "'Bebas Neue', sans-serif", fontSize: 64, color: "#fff8c0", letterSpacing: "0.08em", textShadow: "0 0 18px #ffd848, 0 0 40px #ffaa20, 0 0 80px rgba(255,170,30,0.7)", animation: "fxAuraFlicker 0.8s ease-in-out infinite alternate" }}>
+      {/* Kanji 力 (puissance) qui apparaît au centre */}
+      <div style={{
+        position: "absolute", left: "50%", top: "50%",
+        fontFamily: "'Bebas Neue', sans-serif", fontSize: 80,
+        color: "#fff8c0", letterSpacing: "0.08em", lineHeight: 1,
+        textShadow: "0 0 16px #ffd848, 0 0 36px #ffaa20, 0 0 70px rgba(255,170,30,0.85), 0 4px 14px rgba(0,0,0,0.8)",
+        animation: "fxKanji 2.6s cubic-bezier(.22,1,.36,1) forwards",
+        opacity: 0,
+      }}>
         力
       </div>
     </div>
