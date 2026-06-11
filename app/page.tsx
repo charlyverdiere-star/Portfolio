@@ -217,12 +217,14 @@ const globalStyles = `
   @keyframes fxTriIn3 { from { transform: translate(0, 85px) rotate(200deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
   .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; filter: drop-shadow(0 0 8px rgba(255,216,96,0.85)); }
 
-  /* Impact manga — speed lines convergentes + onomatopée ドン !, rien sur la carte */
-  @keyframes fxMangaFade { 0% { opacity: 0; } 8% { opacity: 1; } 86% { opacity: 1; } 100% { opacity: 0; } }
-  @keyframes fxFlash { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.6); } 35% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); } 100% { opacity: 0; } }
-  @keyframes fxSpeedLines { 0% { opacity: 0; transform: scale(2.4); } 12% { opacity: 1; transform: scale(1); } 70% { opacity: 0.9; transform: scale(0.94); } 100% { opacity: 0; transform: scale(0.85); } }
-  @keyframes fxDon { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-12deg); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.25) rotate(-6deg); } 32% { transform: translate(-50%, -50%) scale(0.95) rotate(-3deg); } 50% { transform: translate(-50%, -50%) scale(1.05) rotate(-4deg); opacity: 1; } 88% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-4deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15) rotate(-4deg); } }
-  @keyframes fxShakeWobble { 0%, 100% { transform: translate(-50%, -50%) rotate(-4deg); } 25% { transform: translate(calc(-50% + 2px), calc(-50% - 1px)) rotate(-4deg); } 50% { transform: translate(calc(-50% - 2px), calc(-50% + 1px)) rotate(-4deg); } 75% { transform: translate(calc(-50% + 1px), calc(-50% + 2px)) rotate(-4deg); } }
+  /* Séquence Dragon Ball : 7 boules s'alignent en arc, illuminations, Shenron sort, fade */
+  @keyframes fxDbFade { 0% { opacity: 0; } 5% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes fxBallPop { 0% { opacity: 0; transform: scale(0) translateY(20px); } 50% { transform: scale(1.25) translateY(0); opacity: 1; } 75% { transform: scale(0.92); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes fxBallGlow { 0%, 100% { filter: drop-shadow(0 0 6px rgba(255,170,30,0.55)); } 50% { filter: drop-shadow(0 0 18px rgba(255,200,60,0.95)) drop-shadow(0 0 30px rgba(255,150,30,0.6)); } }
+  @keyframes fxShenronDraw { 0%, 30% { stroke-dashoffset: 600; opacity: 0; } 35% { opacity: 1; } 75% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+  @keyframes fxShenronRoar { 0%, 50% { transform: scale(0.85); opacity: 0; } 60% { opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.05); opacity: 0; } }
+  @keyframes fxShenronEye { 0%, 55% { opacity: 0; } 65% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes fxSparkle { 0% { opacity: 0; transform: scale(0); } 30% { opacity: 1; transform: scale(1.2); } 60% { opacity: 1; transform: scale(0.7); } 100% { opacity: 0; transform: scale(0.4); } }
 
   /* CONTACT */
   .contact-link { display: flex; align-items: center; gap: 20px; padding: 24px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; color: var(--text); transition: border-color 0.3s, transform 0.3s, background 0.3s; }
@@ -1477,69 +1479,102 @@ function playZelda() {
   o2.start(tl); o2.stop(tl + 1);
 }
 
-/* Lecture & Mangas — Impact manga « DON ! » : boom sub-grave + percussion sèche + cling cristallin */
-function playMangaImpact() {
+/* Lecture & Mangas — Séquence Dragon Ball :
+   - 7 tinkles cristallins échelonnés (un par boule, ascendant en hauteur)
+   - drone grave qui monte pendant l'illumination collective
+   - grondement sub-grave de Shenron qui apparaît
+   - éclat final */
+function playDragonBall() {
   const ctx = getAudioCtx(); if (!ctx) return;
-  const t = ctx.currentTime + 0.02;
-  /* 1. Boom sub-grave : sinus qui descend, c'est l'impact principal */
-  const boom = ctx.createOscillator(); boom.type = "sine";
-  boom.frequency.setValueAtTime(140, t);
-  boom.frequency.exponentialRampToValueAtTime(35, t + 0.5);
-  const bg = ctx.createGain();
-  bg.gain.setValueAtTime(0.0001, t);
-  bg.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
-  bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
-  boom.connect(bg); bg.connect(ctx.destination);
-  boom.start(t); boom.stop(t + 0.85);
-  /* 2. Couche de percussion sèche : noise très court, sec, façon coup de poing */
-  const pBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
-  const pD = pBuf.getChannelData(0);
-  for (let i = 0; i < pD.length; i++) pD[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / pD.length, 2);
-  const pSrc = ctx.createBufferSource(); pSrc.buffer = pBuf;
-  const pBp = ctx.createBiquadFilter(); pBp.type = "bandpass"; pBp.frequency.value = 600; pBp.Q.value = 1.2;
-  const pG = ctx.createGain(); pG.gain.value = 0.32;
-  pSrc.connect(pBp); pBp.connect(pG); pG.connect(ctx.destination);
-  pSrc.start(t);
-  /* 3. Cling cristallin haut : 3 sinus harmoniques aigus, façon « éclat » de manga */
-  ([1760, 2349, 2960] as number[]).forEach((f, i) => {
+  const t0 = ctx.currentTime + 0.02;
+
+  /* 1. Sept tinkles ascendants (un par boule) — 130 ms d'écart, fréquence qui monte */
+  const tinkleFreqs = [880, 988, 1109, 1245, 1397, 1568, 1760]; /* gamme pentatonique ascendante */
+  tinkleFreqs.forEach((f, i) => {
+    const tBall = t0 + i * 0.13;
+    /* sinus + harmonique douce pour effet cloche cristalline */
+    [f, f * 2, f * 3].forEach((freq, h) => {
+      const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, tBall);
+      g.gain.exponentialRampToValueAtTime(0.12 / (h + 1), tBall + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, tBall + 0.55);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(tBall); o.stop(tBall + 0.6);
+    });
+  });
+
+  /* 2. Drone grave qui monte pendant l'illumination collective (après les 7 boules, ~0.95s) */
+  const tDrone = t0 + 0.95;
+  ([55, 82.4, 110] as number[]).forEach((f0, i) => {
+    const o = ctx.createOscillator(); o.type = i === 2 ? "sawtooth" : "sine";
+    o.frequency.setValueAtTime(f0, tDrone);
+    o.frequency.exponentialRampToValueAtTime(f0 * 2.4, tDrone + 1.0);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, tDrone);
+    g.gain.exponentialRampToValueAtTime(0.07 / (i + 1), tDrone + 0.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, tDrone + 1.0);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(tDrone); o.stop(tDrone + 1.05);
+  });
+
+  /* 3. Grondement sub-grave de Shenron qui apparaît (~1.7s) */
+  const tShenron = t0 + 1.7;
+  /* couche 1 : sub-grave qui descend */
+  const sub = ctx.createOscillator(); sub.type = "sine";
+  sub.frequency.setValueAtTime(70, tShenron);
+  sub.frequency.exponentialRampToValueAtTime(28, tShenron + 0.9);
+  const subG = ctx.createGain();
+  subG.gain.setValueAtTime(0.0001, tShenron);
+  subG.gain.exponentialRampToValueAtTime(0.38, tShenron + 0.1);
+  subG.gain.exponentialRampToValueAtTime(0.0001, tShenron + 1.2);
+  sub.connect(subG); subG.connect(ctx.destination);
+  sub.start(tShenron); sub.stop(tShenron + 1.25);
+  /* couche 2 : noise filtré (souffle de Shenron) */
+  const rBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 1.1), ctx.sampleRate);
+  const rD = rBuf.getChannelData(0);
+  for (let i = 0; i < rD.length; i++) rD[i] = Math.random() * 2 - 1;
+  const rSrc = ctx.createBufferSource(); rSrc.buffer = rBuf;
+  const rBp = ctx.createBiquadFilter(); rBp.type = "bandpass"; rBp.Q.value = 1.8;
+  rBp.frequency.setValueAtTime(120, tShenron);
+  rBp.frequency.exponentialRampToValueAtTime(500, tShenron + 1.0);
+  const rG = ctx.createGain();
+  rG.gain.setValueAtTime(0.0001, tShenron);
+  rG.gain.exponentialRampToValueAtTime(0.18, tShenron + 0.15);
+  rG.gain.exponentialRampToValueAtTime(0.0001, tShenron + 1.1);
+  rSrc.connect(rBp); rBp.connect(rG); rG.connect(ctx.destination);
+  rSrc.start(tShenron);
+
+  /* 4. Éclat final : flash cristallin aigu à la fin (~2.7s) */
+  const tFinal = t0 + 2.7;
+  ([2349, 3136, 4186] as number[]).forEach((f, i) => {
     const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t + 0.04);
-    g.gain.exponentialRampToValueAtTime(0.08 / (i + 1), t + 0.06);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+    g.gain.setValueAtTime(0.0001, tFinal);
+    g.gain.exponentialRampToValueAtTime(0.07 / (i + 1), tFinal + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, tFinal + 0.5);
     o.connect(g); g.connect(ctx.destination);
-    o.start(t + 0.04); o.stop(t + 1.15);
+    o.start(tFinal); o.stop(tFinal + 0.55);
   });
-  /* 4. Whoosh préparatoire 80 ms avant l'impact, donne du souffle */
-  const wBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
-  const wD = wBuf.getChannelData(0);
-  for (let i = 0; i < wD.length; i++) wD[i] = (Math.random() * 2 - 1) * Math.sin((i / wD.length) * Math.PI);
-  const wSrc = ctx.createBufferSource(); wSrc.buffer = wBuf;
-  const wBp = ctx.createBiquadFilter(); wBp.type = "bandpass"; wBp.Q.value = 2.5;
-  wBp.frequency.setValueAtTime(2400, t - 0.1);
-  wBp.frequency.exponentialRampToValueAtTime(400, t + 0.05);
-  const wG = ctx.createGain(); wG.gain.value = 0.18;
-  wSrc.connect(wBp); wBp.connect(wG); wG.connect(ctx.destination);
-  wSrc.start(t - 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════
    LOISIRS
 ═══════════════════════════════════════════════════════════ */
-type LoisirFx = "f1" | "muscu" | "zelda" | "manga";
+type LoisirFx = "f1" | "muscu" | "zelda" | "dragonball";
 
 const FX_SOUNDS: Record<LoisirFx, { play: () => void; duration: number }> = {
-  f1:    { play: playF1,           duration: 2300 },
-  muscu: { play: playMuscu,        duration: 2400 },
-  zelda: { play: playZelda,        duration: 2100 },
-  manga: { play: playMangaImpact,  duration: 2000 },
+  f1:         { play: playF1,          duration: 2300 },
+  muscu:      { play: playMuscu,       duration: 2400 },
+  zelda:      { play: playZelda,       duration: 2100 },
+  dragonball: { play: playDragonBall,  duration: 3500 },
 };
 
 const loisirs: { icon: string; title: string; desc: string; tags: string[]; color: string; fx: LoisirFx; sonHint: string }[] = [
   { icon: "🏎️", title: "Formule 1", desc: "Je suis de près la F1 depuis plusieurs années, notamment les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030", fx: "f1", sonHint: "Montée en régime" },
   { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2", fx: "muscu", sonHint: "Série de reps" },
   { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0", fx: "zelda", sonHint: "Un secret bien connu" },
-  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "manga", sonHint: "Impact ドン !" },
+  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "dragonball", sonHint: "Invocation Shenron" },
 ];
 
 function F1Fx() {
@@ -1601,49 +1636,138 @@ function TriforceFx() {
   );
 }
 
-function MangaFx() {
-  /* Impact manga « DON ! » : flash radial au centre + speed lines convergentes + onomatopée
-     katakana en énorme avec contour rouge. Aucune animation sur la carte elle-même. */
+/* Une Dragon Ball : sphère orange avec dégradé + N étoiles rouges à 4 branches */
+function DragonBall({ stars, size = 26 }: { stars: number; size?: number }) {
+  /* Positions des étoiles selon le nombre (1 à 7), inspirées des boules de la série */
+  const positions: Record<number, { cx: number; cy: number }[]> = {
+    1: [{ cx: 50, cy: 50 }],
+    2: [{ cx: 38, cy: 50 }, { cx: 62, cy: 50 }],
+    3: [{ cx: 50, cy: 36 }, { cx: 38, cy: 58 }, { cx: 62, cy: 58 }],
+    4: [{ cx: 38, cy: 38 }, { cx: 62, cy: 38 }, { cx: 38, cy: 62 }, { cx: 62, cy: 62 }],
+    5: [{ cx: 38, cy: 38 }, { cx: 62, cy: 38 }, { cx: 50, cy: 50 }, { cx: 38, cy: 62 }, { cx: 62, cy: 62 }],
+    6: [{ cx: 36, cy: 36 }, { cx: 64, cy: 36 }, { cx: 36, cy: 50 }, { cx: 64, cy: 50 }, { cx: 36, cy: 64 }, { cx: 64, cy: 64 }],
+    7: [{ cx: 36, cy: 32 }, { cx: 64, cy: 32 }, { cx: 36, cy: 50 }, { cx: 64, cy: 50 }, { cx: 50, cy: 50 }, { cx: 36, cy: 68 }, { cx: 64, cy: 68 }],
+  };
+  const pts = positions[stars] || [];
   return (
-    <div className="fx-layer" style={{ animation: "fxMangaFade 2s ease forwards" }}>
-      {/* Flash radial blanc au centre (burst d'énergie) */}
-      <div style={{
-        position: "absolute", left: "50%", top: "50%",
-        width: 100, height: 100, borderRadius: "50%",
-        background: "radial-gradient(circle, #fff 0%, rgba(255,255,255,0.5) 35%, transparent 70%)",
-        animation: "fxFlash 0.65s cubic-bezier(.22,1,.36,1) forwards",
-        opacity: 0,
-      }} />
+    <svg viewBox="0 0 100 100" width={size} height={size} style={{ display: "block" }}>
+      <defs>
+        <radialGradient id={`bg${stars}`} cx="38%" cy="32%" r="68%">
+          <stop offset="0%" stopColor="#ffd966" />
+          <stop offset="35%" stopColor="#ff9a2c" />
+          <stop offset="78%" stopColor="#d4621a" />
+          <stop offset="100%" stopColor="#8a3a08" />
+        </radialGradient>
+      </defs>
+      {/* Corps de la boule */}
+      <circle cx="50" cy="50" r="46" fill={`url(#bg${stars})`} stroke="#5c2a04" strokeWidth="1.5" />
+      {/* Reflet brillant en haut-gauche */}
+      <ellipse cx="36" cy="30" rx="14" ry="8" fill="#fff5d4" opacity="0.55" />
+      <ellipse cx="32" cy="26" rx="5" ry="3" fill="#ffffff" opacity="0.8" />
+      {/* Étoiles à 4 branches (style DBZ) */}
+      {pts.map((p, i) => (
+        <path
+          key={i}
+          d={`M ${p.cx} ${p.cy - 6} L ${p.cx + 1.5} ${p.cy - 1.5} L ${p.cx + 6} ${p.cy} L ${p.cx + 1.5} ${p.cy + 1.5} L ${p.cx} ${p.cy + 6} L ${p.cx - 1.5} ${p.cy + 1.5} L ${p.cx - 6} ${p.cy} L ${p.cx - 1.5} ${p.cy - 1.5} Z`}
+          fill="#c81020"
+          stroke="#5c1010"
+          strokeWidth="0.6"
+        />
+      ))}
+    </svg>
+  );
+}
 
-      {/* Speed lines convergentes (SVG, 24 lignes blanches qui partent du centre vers les bords) */}
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", animation: "fxSpeedLines 2s cubic-bezier(.22,1,.36,1) forwards" }}>
-        {Array.from({ length: 24 }).map((_, i) => {
-          const angle = (i / 24) * Math.PI * 2;
-          const x1 = 50 + Math.cos(angle) * 18;
-          const y1 = 50 + Math.sin(angle) * 18;
-          const x2 = 50 + Math.cos(angle) * 80;
-          const y2 = 50 + Math.sin(angle) * 80;
-          const w = i % 3 === 0 ? 1.6 : i % 2 === 0 ? 1.0 : 0.6;
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#ffffff" strokeWidth={w} opacity={0.85} />;
-        })}
+function DragonBallFx() {
+  /* Séquence complète :
+     - 0 à 950 ms : les 7 boules apparaissent une par une en arc, avec un tinkle cristallin par boule
+     - 950 à 1700 ms : illumination collective, le drone grave monte
+     - 1700 à 2900 ms : Shenron se dessine en silhouette derrière, ses yeux rouges s'allument
+     - 2900 à 3500 ms : éclat cristallin et tout disparaît */
+  const balls = [1, 2, 3, 4, 5, 6, 7]; /* 1 à 7 étoiles */
+  /* Disposition en arc de cercle, ouvert vers le bas (les boules forment un sourire inversé en haut de la carte) */
+  const arcCount = balls.length;
+  const arcRadius = 36;       /* en pourcentage de la largeur de la carte */
+  const centerXPct = 50;
+  const centerYPct = 70;      /* l'arc est dans la moitié haute de la carte */
+  const angleStart = Math.PI * 1.20;
+  const angleEnd   = Math.PI * 1.80;
+  return (
+    <div className="fx-layer" style={{ animation: "fxDbFade 3.5s ease forwards" }}>
+      {/* Shenron (silhouette verte sinueuse) qui se dessine en fond, après les boules */}
+      <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+        {/* Corps sinueux du dragon (path stroke qui se trace progressivement) */}
+        <path
+          d="M 20,170 C 50,150 70,100 110,90 C 150,80 180,120 215,100 C 245,85 265,55 285,45"
+          stroke="#3ea870"
+          strokeWidth="14"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray="600"
+          style={{ animation: "fxShenronDraw 3.5s cubic-bezier(.4,.1,.4,1) forwards" }}
+        />
+        {/* Tête du dragon, plus marquée, à droite */}
+        <g style={{ animation: "fxShenronRoar 3.5s cubic-bezier(.5,.2,.5,1) forwards", transformOrigin: "275px 45px" }}>
+          {/* Tête (forme ovale + cornes) */}
+          <ellipse cx="278" cy="45" rx="20" ry="11" fill="#3ea870" stroke="#1e5838" strokeWidth="1.5" />
+          {/* Cornes */}
+          <path d="M 268,37 L 263,24 L 271,32 Z" fill="#1e5838" />
+          <path d="M 288,37 L 293,24 L 285,32 Z" fill="#1e5838" />
+          {/* Moustaches */}
+          <path d="M 260,48 Q 250,52 244,58" stroke="#1e5838" strokeWidth="1.4" fill="none" />
+          <path d="M 296,48 Q 304,52 308,58" stroke="#1e5838" strokeWidth="1.4" fill="none" />
+          {/* Yeux rouges qui s'allument */}
+          <circle cx="272" cy="44" r="2.2" fill="#ff1818" style={{ animation: "fxShenronEye 3.5s ease forwards", filter: "drop-shadow(0 0 4px #ff3030)" }} />
+          <circle cx="284" cy="44" r="2.2" fill="#ff1818" style={{ animation: "fxShenronEye 3.5s ease forwards", filter: "drop-shadow(0 0 4px #ff3030)" }} />
+        </g>
       </svg>
 
-      {/* Onomatopée ドン ! en énorme, style brush, contour rouge */}
-      <div style={{
-        position: "absolute", left: "50%", top: "50%",
-        fontFamily: "'Bebas Neue', sans-serif",
-        fontSize: "clamp(72px, 14vw, 120px)",
-        lineHeight: 1,
-        color: "#fff",
-        letterSpacing: "0.06em",
-        WebkitTextStroke: "3px #e83030",
-        textShadow: "0 0 24px rgba(232,48,48,0.8), 0 6px 18px rgba(0,0,0,0.9), 6px 6px 0 #e83030",
-        animation: "fxDon 2s cubic-bezier(.34,1.56,.5,1) forwards",
-        opacity: 0,
-        whiteSpace: "nowrap",
-      }}>
-        ドン !
-      </div>
+      {/* Les 7 Dragon Balls en arc de cercle */}
+      {balls.map((n, i) => {
+        const t = arcCount > 1 ? i / (arcCount - 1) : 0.5;
+        const angle = angleStart + (angleEnd - angleStart) * t;
+        const x = centerXPct + Math.cos(angle) * arcRadius;
+        const y = centerYPct + Math.sin(angle) * arcRadius * 0.9;
+        return (
+          <div
+            key={n}
+            style={{
+              position: "absolute",
+              left: `${x}%`, top: `${y}%`,
+              transform: "translate(-50%, -50%)",
+              animation: `fxBallPop 0.5s cubic-bezier(.34,1.56,.5,1) both, fxBallGlow 1.4s ease 1s infinite`,
+              animationDelay: `${i * 0.13}s, ${0.9 + i * 0.05}s`,
+              opacity: 0,
+            }}
+          >
+            <DragonBall stars={n} size={42} />
+          </div>
+        );
+      })}
+
+      {/* Étincelles dorées qui jaillissent autour de l'arc pendant l'illumination */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        const radius = 30 + (i % 3) * 10;
+        const x = 50 + Math.cos(angle) * radius;
+        const y = 65 + Math.sin(angle) * radius * 0.6;
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${x}%`, top: `${y}%`,
+              width: 6, height: 6,
+              transform: "translate(-50%, -50%) rotate(45deg)",
+              background: "radial-gradient(circle, #fff9c8 0%, rgba(255,200,60,0.8) 50%, transparent 80%)",
+              borderRadius: "50%",
+              animation: `fxSparkle 1.2s ease both`,
+              animationDelay: `${1.0 + (i * 0.06)}s`,
+              opacity: 0,
+            }}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -1697,7 +1821,7 @@ function Loisirs() {
             {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
             {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
             {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
-            {activeFx === l.fx && l.fx === "manga" && <MangaFx />}
+            {activeFx === l.fx && l.fx === "dragonball" && <DragonBallFx />}
           </div>
         ))}
       </div>
