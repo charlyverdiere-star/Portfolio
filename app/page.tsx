@@ -206,10 +206,8 @@ const globalStyles = `
   .fx-f1-line { position: absolute; left: 0; height: 2px; width: 30%; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(232,48,48,0.95), transparent); animation: fxDash 0.45s linear infinite; box-shadow: 0 0 12px rgba(232,48,48,0.8); }
   @keyframes fxF1Fade { 0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
 
-  /* Musculation — pump : la carte gonfle/pulse + compteur de reps qui s'incrémente */
-  @keyframes fxPump { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 18% { transform: scale(1.03); box-shadow: 0 0 0 6px rgba(45,125,210,0.18), 0 14px 36px rgba(45,125,210,0.3); } 36% { transform: scale(0.985); box-shadow: 0 0 0 0 rgba(45,125,210,0); } 54% { transform: scale(1.025); box-shadow: 0 0 0 4px rgba(45,125,210,0.15), 0 12px 30px rgba(45,125,210,0.25); } 72% { transform: scale(0.99); } 90% { transform: scale(1.012); } }
-  .loisir-card.fx-pump { animation: fxPump 1.45s cubic-bezier(.45,.05,.55,.95); }
-  @keyframes fxRep { 0% { transform: translateY(34px) scale(0.4); opacity: 0; } 30% { transform: translateY(0) scale(1.15); opacity: 1; } 75% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-22px) scale(1); opacity: 0; } }
+  /* Musculation — compteur de reps en surimpression (rien sur la carte elle-même) */
+  @keyframes fxRep { 0% { transform: translate(-50%, calc(-50% + 30px)) scale(0.4); opacity: 0; } 30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 75% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, calc(-50% - 26px)) scale(1); opacity: 0; } }
   @keyframes fxFlex { 0% { transform: translate(-50%, calc(-50% + 20px)) scale(0.6); opacity: 0; } 30% { transform: translate(-50%, -50%) scale(1.1) rotate(-3deg); opacity: 1; } 60% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0; } }
 
   /* Zelda — triforce qui s'assemble */
@@ -219,12 +217,12 @@ const globalStyles = `
   @keyframes fxTriIn3 { from { transform: translate(0, 85px) rotate(200deg); opacity: 0; } 50% { opacity: 1; } to { transform: none; opacity: 1; } }
   .fx-tri { width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 38px solid #ffd860; position: absolute; filter: drop-shadow(0 0 8px rgba(255,216,96,0.85)); }
 
-  /* Aura SSJ2 — flammes jaunes autour de la carte + éclairs blancs/bleus */
-  @keyframes fxSsj2Halo { 0% { opacity: 0; box-shadow: 0 0 0 0 rgba(255,216,80,0); } 15% { opacity: 1; box-shadow: 0 0 0 3px rgba(255,216,80,0.7), 0 0 50px 8px rgba(255,200,40,0.55), 0 0 90px 14px rgba(255,170,40,0.35); } 35% { box-shadow: 0 0 0 2px rgba(255,216,80,0.55), 0 0 35px 5px rgba(255,200,40,0.4); } 55% { box-shadow: 0 0 0 4px rgba(255,216,80,0.8), 0 0 60px 12px rgba(255,200,40,0.65), 0 0 110px 20px rgba(255,170,40,0.45); } 80% { box-shadow: 0 0 0 2px rgba(255,216,80,0.5), 0 0 40px 6px rgba(255,200,40,0.35); } 100% { opacity: 0; box-shadow: 0 0 0 0 rgba(255,216,80,0); } }
-  .loisir-card.fx-ssj2 { animation: fxSsj2Halo 2.6s cubic-bezier(.5,0,.5,1); }
-  @keyframes fxAuraTongue { 0% { transform: translateY(0) scaleY(0.4); opacity: 0; } 20% { transform: translateY(-30px) scaleY(1.15); opacity: 1; } 55% { transform: translateY(-58px) scaleY(0.85); opacity: 0.95; } 100% { transform: translateY(-110px) scaleY(0.2); opacity: 0; } }
-  @keyframes fxBolt { 0%, 100% { opacity: 0; } 10%, 18% { opacity: 1; } 30% { opacity: 0; } 50%, 56% { opacity: 1; } 65% { opacity: 0; } 78%, 84% { opacity: 1; } 92% { opacity: 0; } }
-  @keyframes fxKanji { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } 70% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
+  /* Impact manga — speed lines convergentes + onomatopée ドン !, rien sur la carte */
+  @keyframes fxMangaFade { 0% { opacity: 0; } 8% { opacity: 1; } 86% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes fxFlash { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.6); } 35% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); } 100% { opacity: 0; } }
+  @keyframes fxSpeedLines { 0% { opacity: 0; transform: scale(2.4); } 12% { opacity: 1; transform: scale(1); } 70% { opacity: 0.9; transform: scale(0.94); } 100% { opacity: 0; transform: scale(0.85); } }
+  @keyframes fxDon { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-12deg); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.25) rotate(-6deg); } 32% { transform: translate(-50%, -50%) scale(0.95) rotate(-3deg); } 50% { transform: translate(-50%, -50%) scale(1.05) rotate(-4deg); opacity: 1; } 88% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-4deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15) rotate(-4deg); } }
+  @keyframes fxShakeWobble { 0%, 100% { transform: translate(-50%, -50%) rotate(-4deg); } 25% { transform: translate(calc(-50% + 2px), calc(-50% - 1px)) rotate(-4deg); } 50% { transform: translate(calc(-50% - 2px), calc(-50% + 1px)) rotate(-4deg); } 75% { transform: translate(calc(-50% + 1px), calc(-50% + 2px)) rotate(-4deg); } }
 
   /* CONTACT */
   .contact-link { display: flex; align-items: center; gap: 20px; padding: 24px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; color: var(--text); transition: border-color 0.3s, transform 0.3s, background 0.3s; }
@@ -1479,87 +1477,69 @@ function playZelda() {
   o2.start(tl); o2.stop(tl + 1);
 }
 
-/* Lecture & Mangas — Super Saiyan 2 : montée d'aura (drone qui monte) + crépitements d'éclairs + flash final */
-function playSSJ2() {
+/* Lecture & Mangas — Impact manga « DON ! » : boom sub-grave + percussion sèche + cling cristallin */
+function playMangaImpact() {
   const ctx = getAudioCtx(); if (!ctx) return;
-  const t = ctx.currentTime;
-  const dur = 2.6;
-  /* 1. Drone d'aura : trois sinus harmoniques qui montent en fréquence et en volume */
-  ([110, 165, 220] as number[]).forEach((f0, i) => {
-    const o = ctx.createOscillator(); o.type = i === 2 ? "sawtooth" : "sine";
-    o.frequency.setValueAtTime(f0, t);
-    o.frequency.exponentialRampToValueAtTime(f0 * 3.2, t + dur - 0.3);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.07 / (i + 1), t + 0.5);
-    g.gain.setValueAtTime(0.07 / (i + 1), t + dur - 0.6);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    const filter = ctx.createBiquadFilter(); filter.type = "lowpass";
-    filter.frequency.setValueAtTime(800, t);
-    filter.frequency.exponentialRampToValueAtTime(5000, t + dur - 0.3);
-    o.connect(filter); filter.connect(g); g.connect(ctx.destination);
-    o.start(t); o.stop(t + dur);
-  });
-  /* 2. Souffle de l'aura : noise bandpass qui « respire » */
-  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource(); src.buffer = buf;
-  const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 1.8;
-  bp.frequency.setValueAtTime(600, t);
-  bp.frequency.exponentialRampToValueAtTime(2400, t + dur - 0.3);
-  const lfo = ctx.createOscillator();
-  lfo.frequency.setValueAtTime(4, t);
-  lfo.frequency.linearRampToValueAtTime(11, t + dur);
-  const lfoG = ctx.createGain(); lfoG.gain.value = 320;
-  lfo.connect(lfoG); lfoG.connect(bp.frequency);
-  const sg = ctx.createGain();
-  sg.gain.setValueAtTime(0.0001, t);
-  sg.gain.exponentialRampToValueAtTime(0.14, t + 0.6);
-  sg.gain.setValueAtTime(0.14, t + dur - 0.7);
-  sg.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  src.connect(bp); bp.connect(sg); sg.connect(ctx.destination);
-  src.start(t); lfo.start(t); lfo.stop(t + dur);
-  /* 3. Crépitements d'éclairs : burst de noise très court à des moments précis */
-  [0.55, 0.95, 1.25, 1.55, 1.85, 2.10].forEach((dt) => {
-    const cb = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.12), ctx.sampleRate);
-    const cd = cb.getChannelData(0);
-    for (let i = 0; i < cd.length; i++) cd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / cd.length, 3);
-    const cs = ctx.createBufferSource(); cs.buffer = cb;
-    const cf = ctx.createBiquadFilter(); cf.type = "highpass"; cf.frequency.value = 2800;
-    const cg = ctx.createGain(); cg.gain.value = 0.16;
-    cs.connect(cf); cf.connect(cg); cg.connect(ctx.destination);
-    cs.start(t + dt);
-  });
-  /* 4. Flash final : sub-boom + cymbale courte */
-  const tFinal = t + dur - 0.05;
+  const t = ctx.currentTime + 0.02;
+  /* 1. Boom sub-grave : sinus qui descend, c'est l'impact principal */
   const boom = ctx.createOscillator(); boom.type = "sine";
-  boom.frequency.setValueAtTime(180, tFinal);
-  boom.frequency.exponentialRampToValueAtTime(45, tFinal + 0.5);
+  boom.frequency.setValueAtTime(140, t);
+  boom.frequency.exponentialRampToValueAtTime(35, t + 0.5);
   const bg = ctx.createGain();
-  bg.gain.setValueAtTime(0.32, tFinal);
-  bg.gain.exponentialRampToValueAtTime(0.0001, tFinal + 0.7);
+  bg.gain.setValueAtTime(0.0001, t);
+  bg.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+  bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
   boom.connect(bg); bg.connect(ctx.destination);
-  boom.start(tFinal); boom.stop(tFinal + 0.75);
+  boom.start(t); boom.stop(t + 0.85);
+  /* 2. Couche de percussion sèche : noise très court, sec, façon coup de poing */
+  const pBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
+  const pD = pBuf.getChannelData(0);
+  for (let i = 0; i < pD.length; i++) pD[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / pD.length, 2);
+  const pSrc = ctx.createBufferSource(); pSrc.buffer = pBuf;
+  const pBp = ctx.createBiquadFilter(); pBp.type = "bandpass"; pBp.frequency.value = 600; pBp.Q.value = 1.2;
+  const pG = ctx.createGain(); pG.gain.value = 0.32;
+  pSrc.connect(pBp); pBp.connect(pG); pG.connect(ctx.destination);
+  pSrc.start(t);
+  /* 3. Cling cristallin haut : 3 sinus harmoniques aigus, façon « éclat » de manga */
+  ([1760, 2349, 2960] as number[]).forEach((f, i) => {
+    const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t + 0.04);
+    g.gain.exponentialRampToValueAtTime(0.08 / (i + 1), t + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t + 0.04); o.stop(t + 1.15);
+  });
+  /* 4. Whoosh préparatoire 80 ms avant l'impact, donne du souffle */
+  const wBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
+  const wD = wBuf.getChannelData(0);
+  for (let i = 0; i < wD.length; i++) wD[i] = (Math.random() * 2 - 1) * Math.sin((i / wD.length) * Math.PI);
+  const wSrc = ctx.createBufferSource(); wSrc.buffer = wBuf;
+  const wBp = ctx.createBiquadFilter(); wBp.type = "bandpass"; wBp.Q.value = 2.5;
+  wBp.frequency.setValueAtTime(2400, t - 0.1);
+  wBp.frequency.exponentialRampToValueAtTime(400, t + 0.05);
+  const wG = ctx.createGain(); wG.gain.value = 0.18;
+  wSrc.connect(wBp); wBp.connect(wG); wG.connect(ctx.destination);
+  wSrc.start(t - 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════
    LOISIRS
 ═══════════════════════════════════════════════════════════ */
-type LoisirFx = "f1" | "muscu" | "zelda" | "ssj2";
+type LoisirFx = "f1" | "muscu" | "zelda" | "manga";
 
 const FX_SOUNDS: Record<LoisirFx, { play: () => void; duration: number }> = {
-  f1:    { play: playF1,    duration: 2300 },
-  muscu: { play: playMuscu, duration: 2400 },
-  zelda: { play: playZelda, duration: 2100 },
-  ssj2:  { play: playSSJ2,  duration: 2700 },
+  f1:    { play: playF1,           duration: 2300 },
+  muscu: { play: playMuscu,        duration: 2400 },
+  zelda: { play: playZelda,        duration: 2100 },
+  manga: { play: playMangaImpact,  duration: 2000 },
 };
 
 const loisirs: { icon: string; title: string; desc: string; tags: string[]; color: string; fx: LoisirFx; sonHint: string }[] = [
   { icon: "🏎️", title: "Formule 1", desc: "Je suis de près la F1 depuis plusieurs années, notamment les évolutions technologiques des monoplaces — aérodynamique, systèmes hybrides, électronique embarquée. Un univers qui rejoint directement mes intérêts en ingénierie.", tags: ["Aérodynamique", "Technologie", "Stratégie"], color: "#e83030", fx: "f1", sonHint: "Montée en régime" },
   { icon: "🏋️", title: "Musculation", desc: "La musculation m'apporte rigueur, constance et dépassement de soi. Comme en ingénierie, progresser demande une méthodologie précise, de la régularité et une bonne analyse de ses propres résultats.", tags: ["Rigueur", "Persévérance", "Méthode"], color: "#2d7dd2", fx: "muscu", sonHint: "Série de reps" },
   { icon: "🎮", title: "Jeux vidéo", desc: "Les jeux vidéo développent la logique, la réactivité et la résolution de problèmes. J'apprécie particulièrement les univers qui combinent stratégie et maîtrise technique.", tags: ["Logique", "Stratégie", "Réactivité"], color: "#9040c0", fx: "zelda", sonHint: "Un secret bien connu" },
-  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "ssj2", sonHint: "Montée en puissance" },
+  { icon: "📚", title: "Lecture & Mangas", desc: "Lecteur de fantasy et de mangas, j'apprécie les récits qui combinent imagination et profondeur. La culture japonaise m'attire également par sa philosophie du travail bien fait — une vision proche de l'exigence industrielle.", tags: ["Fantasy", "Mangas", "Culture JP"], color: "#e06020", fx: "manga", sonHint: "Impact ドン !" },
 ];
 
 function F1Fx() {
@@ -1621,54 +1601,48 @@ function TriforceFx() {
   );
 }
 
-function SSJ2Fx() {
-  /* Aura SSJ2 v2 : halo doré sur la carte (via fx-ssj2 box-shadow), langues de flammes
-     en bas, éclairs blancs/bleus en SVG simples, kanji 力 au centre.
-     PAS de mix-blend-mode, PAS de backdrop-filter, PAS de SVG filter (instables sur Opera GX / Safari). */
-  const flames = [
-    { left: "6%",  delay: 0.05, scale: 1.0,  hue: "#ffe060" },
-    { left: "20%", delay: 0.25, scale: 0.85, hue: "#ffc830" },
-    { left: "35%", delay: 0.0,  scale: 1.05, hue: "#ffd848" },
-    { left: "50%", delay: 0.35, scale: 0.95, hue: "#ffb820" },
-    { left: "65%", delay: 0.1,  scale: 1.05, hue: "#ffd040" },
-    { left: "78%", delay: 0.3,  scale: 0.9,  hue: "#ffc638" },
-    { left: "90%", delay: 0.15, scale: 1.0,  hue: "#ffe068" },
-  ];
+function MangaFx() {
+  /* Impact manga « DON ! » : flash radial au centre + speed lines convergentes + onomatopée
+     katakana en énorme avec contour rouge. Aucune animation sur la carte elle-même. */
   return (
-    <div className="fx-layer">
-      {/* Langues de flammes jaunes qui montent depuis le bas (boucle infinie pendant l'effet) */}
-      {flames.map((f, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          left: f.left, bottom: "-15%",
-          width: 32 * f.scale, height: 80 * f.scale,
-          background: `radial-gradient(ellipse at 50% 100%, ${f.hue} 0%, rgba(255,170,30,0.7) 50%, rgba(255,120,20,0) 90%)`,
-          borderRadius: "50% 50% 30% 30% / 70% 70% 30% 30%",
-          animation: "fxAuraTongue 1.0s cubic-bezier(.55,.1,.7,.9) infinite, fxF1Fade 2.6s ease forwards",
-          animationDelay: `${f.delay}s, 0s`,
-          transform: "translateX(-50%)",
-        }} />
-      ))}
-
-      {/* Éclairs bleus/blancs en SVG simples (sans filter, sans glow SVG) */}
-      <svg viewBox="0 0 200 200" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-        <g style={{ animation: "fxBolt 2.6s linear forwards" }}>
-          <path d="M30,10 L42,60 L28,64 L52,135 L44,88 L60,82 L34,12" stroke="#9fdcff" strokeWidth="2.2" fill="none" />
-          <path d="M170,22 L156,70 L172,76 L142,150 L158,108 L142,102 L164,24" stroke="#bdebff" strokeWidth="2.2" fill="none" />
-          <path d="M100,5 L92,40 L108,46 L88,98 L102,58 L92,54 L102,7" stroke="#ffffff" strokeWidth="2" fill="none" />
-        </g>
-      </svg>
-
-      {/* Kanji 力 (puissance) qui apparaît au centre */}
+    <div className="fx-layer" style={{ animation: "fxMangaFade 2s ease forwards" }}>
+      {/* Flash radial blanc au centre (burst d'énergie) */}
       <div style={{
         position: "absolute", left: "50%", top: "50%",
-        fontFamily: "'Bebas Neue', sans-serif", fontSize: 80,
-        color: "#fff8c0", letterSpacing: "0.08em", lineHeight: 1,
-        textShadow: "0 0 16px #ffd848, 0 0 36px #ffaa20, 0 0 70px rgba(255,170,30,0.85), 0 4px 14px rgba(0,0,0,0.8)",
-        animation: "fxKanji 2.6s cubic-bezier(.22,1,.36,1) forwards",
+        width: 100, height: 100, borderRadius: "50%",
+        background: "radial-gradient(circle, #fff 0%, rgba(255,255,255,0.5) 35%, transparent 70%)",
+        animation: "fxFlash 0.65s cubic-bezier(.22,1,.36,1) forwards",
         opacity: 0,
+      }} />
+
+      {/* Speed lines convergentes (SVG, 24 lignes blanches qui partent du centre vers les bords) */}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", animation: "fxSpeedLines 2s cubic-bezier(.22,1,.36,1) forwards" }}>
+        {Array.from({ length: 24 }).map((_, i) => {
+          const angle = (i / 24) * Math.PI * 2;
+          const x1 = 50 + Math.cos(angle) * 18;
+          const y1 = 50 + Math.sin(angle) * 18;
+          const x2 = 50 + Math.cos(angle) * 80;
+          const y2 = 50 + Math.sin(angle) * 80;
+          const w = i % 3 === 0 ? 1.6 : i % 2 === 0 ? 1.0 : 0.6;
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#ffffff" strokeWidth={w} opacity={0.85} />;
+        })}
+      </svg>
+
+      {/* Onomatopée ドン ! en énorme, style brush, contour rouge */}
+      <div style={{
+        position: "absolute", left: "50%", top: "50%",
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: "clamp(72px, 14vw, 120px)",
+        lineHeight: 1,
+        color: "#fff",
+        letterSpacing: "0.06em",
+        WebkitTextStroke: "3px #e83030",
+        textShadow: "0 0 24px rgba(232,48,48,0.8), 0 6px 18px rgba(0,0,0,0.9), 6px 6px 0 #e83030",
+        animation: "fxDon 2s cubic-bezier(.34,1.56,.5,1) forwards",
+        opacity: 0,
+        whiteSpace: "nowrap",
       }}>
-        力
+        ドン !
       </div>
     </div>
   );
@@ -1702,34 +1676,30 @@ function Loisirs() {
         </p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
-        {loisirs.map((l, i) => {
-          const isPump = activeFx === "muscu" && l.fx === "muscu";
-          const isAura = activeFx === "ssj2" && l.fx === "ssj2";
-          return (
-            <div
-              key={l.title}
-              className={`loisir-card reveal reveal-delay-${(i % 4) + 1}${isPump ? " fx-pump" : ""}${isAura ? " fx-ssj2" : ""}`}
-              style={{ borderTop: `2px solid ${l.color}60` }}
-              onClick={() => trigger(l.fx)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && trigger(l.fx)}
-              aria-label={`${l.title} — jouer l'ambiance sonore`}
-            >
-              <span className="loisir-icon">{l.icon}</span>
-              <div className="loisir-sound-badge"><Volume2 size={13} /> {l.sonHint}</div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>{l.title}</h3>
-              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{l.desc}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {l.tags.map((t) => <span key={t} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${l.color}40`, fontSize: 11, color: l.color, background: `${l.color}10` }}>{t}</span>)}
-              </div>
-              {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
-              {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
-              {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
-              {activeFx === l.fx && l.fx === "ssj2" && <SSJ2Fx />}
+        {loisirs.map((l, i) => (
+          <div
+            key={l.title}
+            className={`loisir-card reveal reveal-delay-${(i % 4) + 1}`}
+            style={{ borderTop: `2px solid ${l.color}60` }}
+            onClick={() => trigger(l.fx)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && trigger(l.fx)}
+            aria-label={`${l.title} — jouer l'ambiance sonore`}
+          >
+            <span className="loisir-icon">{l.icon}</span>
+            <div className="loisir-sound-badge"><Volume2 size={13} /> {l.sonHint}</div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>{l.title}</h3>
+            <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{l.desc}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {l.tags.map((t) => <span key={t} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${l.color}40`, fontSize: 11, color: l.color, background: `${l.color}10` }}>{t}</span>)}
             </div>
-          );
-        })}
+            {activeFx === l.fx && l.fx === "f1" && <F1Fx />}
+            {activeFx === l.fx && l.fx === "muscu" && <MuscuFx />}
+            {activeFx === l.fx && l.fx === "zelda" && <TriforceFx />}
+            {activeFx === l.fx && l.fx === "manga" && <MangaFx />}
+          </div>
+        ))}
       </div>
       <div className="reveal" style={{ marginTop: 60, display: "flex", gap: 16, flexWrap: "wrap" }}>
         {[
